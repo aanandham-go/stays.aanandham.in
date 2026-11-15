@@ -204,7 +204,7 @@ function HimachalStayGuide() {
             <div style={{ position: 'relative', width: '100%', height: '180px' }}>
               <Image
                 src="/images/treks/kheerganga-trek-parvati-valley.jpg"
-                alt="Panoramic campsite and alpine meadow of Kheerganga surrounded by towering pine trees in Parvati Valley"
+                alt="Trekkers with backpacks and hiking gear climbing the scenic high-altitude mountain trail in Parvati Valley"
                 fill
                 sizes="(max-width: 600px) 100vw, 350px"
                 style={{ objectFit: 'cover' }}
@@ -232,7 +232,7 @@ function HimachalStayGuide() {
             <div style={{ position: 'relative', width: '100%', height: '180px' }}>
               <Image
                 src="/images/treks/bhun-buni-thatch-alpine-camp.jpg"
-                alt="High alpine snow peaks and mountain ridges above Kalga village along the Bhun Buni Thatch trek"
+                alt="Trekkers traversing the panoramic alpine ridge trail towards Bhun Buni Thatch surrounded by Himalayan snow peaks"
                 fill
                 sizes="(max-width: 600px) 100vw, 350px"
                 style={{ objectFit: 'cover' }}
@@ -260,7 +260,7 @@ function HimachalStayGuide() {
             <div style={{ position: 'relative', width: '100%', height: '180px' }}>
               <Image
                 src="/images/treks/bhandak-thach-pulga-forest.jpg"
-                alt="Ancient mossy pine trunks and enchanted trail of Fairy Forest in Pulga village leading to Bhandak Thach"
+                alt="Backpackers with hiking packs and trekking poles journeying through the mountain path towards Bhandak Thach"
                 fill
                 sizes="(max-width: 600px) 100vw, 350px"
                 style={{ objectFit: 'cover' }}

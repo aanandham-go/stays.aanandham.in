@@ -53,7 +53,7 @@ export const treksData: TrekItem[] = [
       'Hot Meals Included'
     ],
     image: '/images/treks/kheerganga-trek-parvati-valley.jpg',
-    imageAlt: 'Panoramic campsite and alpine meadow of Kheerganga surrounded by towering pine trees in Parvati Valley Himachal',
+    imageAlt: 'Trekkers with backpacks and hiking gear climbing the scenic high-altitude mountain trail in Parvati Valley Himachal',
     waMessage: 'Hi Aanandham! I want to enquire about the Kheerganga Trek (₹900/person) starting from Kalga Village.'
   },
   {
@@ -86,7 +86,7 @@ export const treksData: TrekItem[] = [
       'Uncrowded Wilderness Solace'
     ],
     image: '/images/treks/bhun-buni-thatch-alpine-camp.jpg',
-    imageAlt: 'High alpine snow peaks and mountain ridges above Kalga village along the Bhun Buni Thatch trek in Parvati Valley',
+    imageAlt: 'Trekkers traversing the panoramic alpine ridge trail towards Bhun Buni Thatch surrounded by Himalayan snow peaks',
     waMessage: 'Hi Aanandham! I want to enquire about the Bhun Buni Thatch Trek (₹3,000/person) starting from Kalga Village.'
   },
   {
@@ -121,7 +121,7 @@ export const treksData: TrekItem[] = [
       'Raw Himalayan Wilderness'
     ],
     image: '/images/treks/bhandak-thach-pulga-forest.jpg',
-    imageAlt: 'Ancient mossy pine trunks and enchanted trail of Fairy Forest in Pulga village leading to Bhandak Thach meadow',
+    imageAlt: 'Backpackers with hiking packs and trekking poles journeying through the mountain path towards Bhandak Thach',
     waMessage: 'Hi Aanandham! I want to enquire about the Bhandak Thach Trek (₹3,999/person, proposed) starting from Pulga village.'
   }
 ];
