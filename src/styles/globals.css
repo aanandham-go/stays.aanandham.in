@@ -1,0 +1,195 @@
+@import './tokens.css';
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-sans);
+  overflow-x: clip;
+  scrollbar-gutter: stable;
+  width: 100%;
+  min-height: 100%;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+body {
+  width: 100%;
+  min-height: 100%;
+  position: relative;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Typography & Headings Hierarchy ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-display);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+h2 {
+  font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+}
+
+h3 {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+p {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+/* ── Accessibility & Focus Rings ── */
+:focus-visible {
+  outline: 3px solid var(--color-brand-pine);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.skip-to-content {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  background: var(--color-brand-pine);
+  color: var(--color-text-light);
+  padding: 12px 20px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  z-index: 99999;
+  transition: top var(--transition-fast);
+}
+
+.skip-to-content:focus {
+  top: 16px;
+}
+
+/* ── Layout Containers ── */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(16px, 3.5vw, 32px);
+  padding-right: clamp(16px, 3.5vw, 32px);
+}
+
+.container-narrow {
+  width: 100%;
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(16px, 3.5vw, 32px);
+  padding-right: clamp(16px, 3.5vw, 32px);
+}
+
+/* ── Utility Badges & Tags ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--color-brand-pine-light);
+  color: var(--color-brand-pine);
+}
+
+.badge-amber {
+  background: var(--color-brand-amber-light);
+  color: var(--color-brand-amber);
+}
+
+/* ── Accessible Tap Targets (>=44px) ── */
+button, .btn, a.btn {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border-radius: var(--radius-full);
+  padding: 10px 24px;
+  transition: all var(--transition-normal);
+}
+
+.btn-primary {
+  background: var(--color-brand-pine);
+  color: var(--color-text-light);
+}
+
+.btn-primary:hover {
+  background: var(--color-brand-pine-hover);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-medium);
+}
+
+.btn-outline:hover {
+  background: var(--color-bg-subtle);
+  border-color: var(--color-text-primary);
+}
+
+.btn-amber {
+  background: var(--color-brand-amber);
+  color: var(--color-text-light);
+}
+
+.btn-amber:hover {
+  background: var(--color-brand-terracotta);
+}
+
+/* ── Clean Scrollbars ── */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

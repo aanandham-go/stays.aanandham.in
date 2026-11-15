@@ -1,0 +1,2313 @@
+"use client";
+import React, { useState, useEffect, useMemo } from 'react';
+
+const CARD_WHITE = { background: '#FFFFFF', borderRadius: '24px', padding: '32px', border: '1px solid rgba(18, 22, 19, 0.08)', marginBottom: '32px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' };
+const IMG_FILL = { width: '100%', height: '100%', objectFit: 'cover' };
+const ROW_GAP_6 = { display: 'inline-flex', alignItems: 'center', gap: '6px' };
+const ROW_SPACE_12 = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', flexWrap: 'wrap', columnGap: '12px' };
+
+import { useParams, useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import SiteHeader from '../../../components/SiteHeader.jsx';
+import Footer from '../../../components/Footer';
+import dynamic from 'next/dynamic';
+const BookingEngineModal = dynamic(() => import('../../../components/BookingEngineModal'), { ssr: false });
+import CustomDateBatchPicker from '../../../components/CustomDateBatchPicker';
+import CustomSelectDropdown from '../../../components/CustomSelectDropdown';
+import LucideAmenityIcon from '../../../components/common/LucideAmenityIcon';
+import { SkeletonPropertyDetail, AssetImage } from '../../../components/common/SkeletonLoader';
+import { Check, X, Sparkles, MapPin, Mountain, Clock, Compass, Share2, Heart, Tent, Users, ShieldCheck, Trees, Camera, Zap, Lock, TriangleAlert, CheckCircle2, Building2, Home, Bed, Landmark, Bath, BedDouble, Maximize2, ImageOff, Navigation, ExternalLink, MapPinOff } from 'lucide-react';
+import { WhatsAppIcon } from '../../../components/common/BrandIcons';
+import { INITIAL_ALL_CAMPS, getAllCamps, getCampById, saveAllCamps } from '../../../lib/campsData';
+import { inr, getDefaultUpcomingBatch, parseStayNights } from '../../../lib/utils';
+import { waLink, logWhatsAppInquiry } from '../../../lib/whatsapp';
+import { CANCELLATION_TIERS } from '../../../lib/cancellation';
+import { loadDiscountsFromStorage, applyDiscounts } from '../../../lib/discountsCore';
+import { resolvePropertyType, getPricingUnitLabel, getInventoryTypeMeta } from '../../../lib/propertyStayTypes';
+
+export function parseRoomCapacity(capacityStr) {
+    if (!capacityStr) return 2;
+    const match = String(capacityStr).match(/\d+/);
+    return match ? Math.max(1, parseInt(match[0], 10)) : 2;
+}
+
+export default function CampPropertyDetailClient({ campId, initialCamp, initialAllCamps = [] }) {
+    const [camp, setCamp] = useState(initialCamp || null);
+    const [allCamps, setAllCamps] = useState(initialAllCamps || []);
+    const [isLoaded, setIsLoaded] = useState(!!initialCamp);
+    const [activePhotoIdx, setActivePhotoIdx] = useState(0);
+    const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+    const [lightboxPhotos, setLightboxPhotos] = useState([]);
+    const [lightboxTitle, setLightboxTitle] = useState('');
+    const [lightboxSub, setLightboxSub] = useState('');
+
+    const openLightbox = (photos, startIdx = 0, title = '', sub = '') => {
+        const valid = Array.isArray(photos) ? photos.filter(Boolean) : [];
+        if (valid.length === 0) return;
+        setLightboxPhotos(valid);
+        setActivePhotoIdx(Math.max(0, Math.min(startIdx, valid.length - 1)));
+        setLightboxTitle(title);
+        setLightboxSub(sub);
+        setIsLightboxOpen(true);
+    };
+    
+    // Booking Selector State with Dynamic Date
+    const [selectedRoomId, setSelectedRoomId] = useState(initialCamp?.rooms?.[0]?.id || null);
+    const [selectedDate, setSelectedDate] = useState(() => getDefaultUpcomingBatch());
+    const [guestsCount, setGuestsCount] = useState(2);
+    const [capacityWarning, setCapacityWarning] = useState(false);
+    const [customUnits, setCustomUnits] = useState(null);
+    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+    const [discounts, setDiscounts] = useState(null);
+    const [liveInventory, setLiveInventory] = useState({});
+    const [isCheckingInventory, setIsCheckingInventory] = useState(false);
+
+    // Fetch real-time room availability from PMS for selected date batch
+    useEffect(() => {
+        if (!camp?.id || !selectedDate) return;
+        let isMounted = true;
+        setIsCheckingInventory(true);
+        fetch(`/api/camps/${encodeURIComponent(camp.id)}/availability?date=${encodeURIComponent(selectedDate)}`, { cache: 'no-store' })
+            .then(r => r.json())
+            .then(data => {
+                if (isMounted && data.success && data.rooms) {
+                    setLiveInventory(data.rooms);
+                }
+            })
+            .catch(err => {
+                console.warn('Failed to load real-time availability:', err);
+            })
+            .finally(() => {
+                if (isMounted) setIsCheckingInventory(false);
+            });
+        return () => { isMounted = false; };
+    }, [camp?.id, selectedDate]);
+
+    // Load active discount campaigns (server authoritative, localStorage fallback)
+    useEffect(() => {
+        setDiscounts(loadDiscountsFromStorage());
+        fetch('/api/discounts', { cache: 'no-store' })
+            .then(r => r.json())
+            .then(data => {
+                if (data && Array.isArray(data.discounts)) setDiscounts(data.discounts);
+            })
+            .catch(() => { /* keep localStorage fallback */ });
+    }, []);
+
+    // Wishlist & Share Toast
+    const [wishlist, setWishlist] = useState([]);
+    const [shareToast, setShareToast] = useState('');
+    const [activeTimelineDay, setActiveTimelineDay] = useState(0);
+    const toastTimerRef = React.useRef(null);
+
+    // Defensive array normalizers (handles arrays, comma-delimited strings, or JSON strings from PMS)
+    const safeInclusions = React.useMemo(() => {
+        if (Array.isArray(camp?.inclusions)) return camp.inclusions.filter(Boolean);
+        if (typeof camp?.inclusions === 'string' && camp.inclusions.trim()) {
+            try {
+                const parsed = JSON.parse(camp.inclusions);
+                if (Array.isArray(parsed)) return parsed.filter(Boolean);
+            } catch {}
+            return camp.inclusions.split(',').map(s => s.trim()).filter(Boolean);
+        }
+        return [];
+    }, [camp?.inclusions]);
+
+    const safeExclusions = React.useMemo(() => {
+        if (Array.isArray(camp?.exclusions)) return camp.exclusions.filter(Boolean);
+        if (typeof camp?.exclusions === 'string' && camp.exclusions.trim()) {
+            try {
+                const parsed = JSON.parse(camp.exclusions);
+                if (Array.isArray(parsed)) return parsed.filter(Boolean);
+            } catch {}
+            return camp.exclusions.split(',').map(s => s.trim()).filter(Boolean);
+        }
+        return [];
+    }, [camp?.exclusions]);
+
+    const safeHighlights = React.useMemo(() => {
+        const raw = camp?.highlights || camp?.amenities;
+        if (Array.isArray(raw)) return raw.filter(Boolean);
+        if (typeof raw === 'string' && raw.trim()) {
+            try {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) return parsed.filter(Boolean);
+            } catch {}
+            return raw.split(',').map(s => s.trim()).filter(Boolean);
+        }
+        return [];
+    }, [camp?.highlights, camp?.amenities]);
+
+    useEffect(() => {
+        let isMounted = true;
+        const refreshCampData = async () => {
+            if (initialCamp) {
+                if (isMounted) setIsLoaded(true);
+                return;
+            }
+            try {
+                const res = await fetch('/api/admin/camps', { cache: 'no-store' });
+                if (res.ok) {
+                    const serverCamps = await res.json();
+                    if (Array.isArray(serverCamps) && serverCamps.length > 0) {
+                        saveAllCamps(serverCamps);
+                        if (isMounted) setAllCamps(serverCamps);
+                        const cleanTarget = String(campId).toLowerCase().replace('pkg-', '').trim();
+                        const matched = serverCamps.find(c => {
+                            const cleanC = String(c.id).toLowerCase().replace('pkg-', '').trim();
+                            const cleanSlug = String(c.slug || '').toLowerCase().trim();
+                            return c.id === campId || cleanC === cleanTarget || cleanSlug === cleanTarget;
+                        });
+                        if (matched && isMounted) {
+                            setCamp(matched);
+                            if (matched.rooms && matched.rooms.length > 0) {
+                                setSelectedRoomId(prev => prev || matched.rooms[0].id);
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+            } finally {
+                if (isMounted) setIsLoaded(true);
+            }
+        };
+
+        try {
+            const savedWishlist = JSON.parse(localStorage.getItem('aanandham_user_wishlist') || '[]');
+            if (isMounted) setWishlist(savedWishlist);
+        } catch (e) {}
+
+        const handleStorage = () => {
+            const cached = getAllCamps();
+            if (Array.isArray(cached) && cached.length > 0) {
+                if (isMounted) setAllCamps(cached);
+                const cleanTarget = String(campId).toLowerCase().replace('pkg-', '').trim();
+                const matched = cached.find(c => {
+                    const cleanC = String(c.id).toLowerCase().replace('pkg-', '').trim();
+                    const cleanSlug = String(c.slug || '').toLowerCase().trim();
+                    return c.id === campId || cleanC === cleanTarget || cleanSlug === cleanTarget;
+                });
+                if (matched && isMounted) setCamp(matched);
+            }
+        };
+        window.addEventListener('storage', handleStorage);
+
+        return () => {
+            isMounted = false;
+            if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+            window.removeEventListener('storage', handleStorage);
+        };
+    }, [campId, initialCamp]);
+
+    const handleToggleWishlist = () => {
+        if (!camp) return;
+        let updated;
+        const isLiked = wishlist.includes(camp.id);
+        if (isLiked) {
+            updated = wishlist.filter(id => id !== camp.id);
+            setShareToast(`Removed "${camp.title}" from your wishlist`);
+        } else {
+            updated = [...wishlist, camp.id];
+            setShareToast(`❤️ Added "${camp.title}" to your saved wishlist!`);
+        }
+        setWishlist(updated);
+        try {
+            localStorage.setItem('aanandham_user_wishlist', JSON.stringify(updated));
+        } catch (e) {}
+        if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = setTimeout(() => setShareToast(''), 3000);
+    };
+
+    // 404 SANCTUARY NOT FOUND SCREEN
+    if (isLoaded && !camp) {
+        return (
+            <div style={{ minHeight: '100vh', background: '#0B150E', color: '#FFFFFF', display: 'flex', flexDirection: 'column' }}>
+                <SiteHeader />
+                <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 20px 60px', textAlign: 'center' }}>
+                    <div style={{ maxWidth: '520px', width: '100%', background: '#121E15', padding: '44px 28px', borderRadius: '28px', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 25px 60px rgba(0,0,0,0.5)' }}>
+                        <div style={{ fontSize: '54px', marginBottom: '16px', display: 'inline-flex' }}><Compass size={54} strokeWidth={1.5} /></div>
+                        <span style={{ fontSize: '11px', fontWeight: '800', background: 'rgba(213,237,85,0.15)', color: '#D5ED55', padding: '5px 14px', borderRadius: '999px', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                            404 · Basecamp Not Found
+                        </span>
+                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: '800', margin: '18px 0 12px', color: '#FFFFFF' }}>
+                            Wilderness Sanctuary Not Found
+                        </h2>
+                        <p style={{ fontSize: '14px', color: '#A2B6A6', lineHeight: 1.6, marginBottom: '28px' }}>
+                            The high-altitude campsite or expedition route you requested does not exist or has been relocated by forest staff.
+                        </p>
+                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                            <Link href="/camps" className="btn-lime" style={{ padding: '13px 26px', fontSize: '14px', fontWeight: '800', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                                <span>Explore Verified Sanctuaries</span>
+                                <span>→</span>
+                            </Link>
+                            <Link href="/" style={{ padding: '13px 26px', fontSize: '14px', fontWeight: '800', color: '#FFFFFF', background: 'rgba(255,255,255,0.08)', borderRadius: '999px', textDecoration: 'none' }}>
+                                Return Home
+                            </Link>
+                        </div>
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
+
+    if (!camp) {
+        return (
+            <div style={{ minHeight: '100vh', background: '#F8F9F5', color: '#121613' }}>
+                <SiteHeader transparentOnTop={false} activePage="camps" />
+                <main style={{ paddingBottom: '120px' }}>
+                    <SkeletonPropertyDetail />
+                </main>
+                <Footer />
+            </div>
+        );
+    }
+
+    const isRealPhoto = (url) => {
+        if (!url || typeof url !== 'string') return false;
+        const trimmed = url.trim();
+        if (!trimmed) return false;
+        if (trimmed.includes('images.unsplash.com')) return false;
+        return true;
+    };
+
+    const isLiked = wishlist.includes(camp.id);
+    const rawGallery = Array.isArray(camp.gallery) ? camp.gallery.filter(g => isRealPhoto(g)) : [];
+    const mainImg = isRealPhoto(camp.image) ? camp.image.trim() : null;
+    const gallery = rawGallery.length > 0 ? rawGallery : (mainImg ? [mainImg] : []);
+
+    const hasCoords = typeof camp.latitude === 'number' && typeof camp.longitude === 'number' && !isNaN(camp.latitude) && !isNaN(camp.longitude);
+    const hasLocationName = Boolean((camp.location && camp.location.trim()) || (camp.region && camp.region.trim()));
+    const hasMapEmbed = hasCoords || hasLocationName;
+    const mapEmbedUrl = hasCoords
+        ? `https://maps.google.com/maps?q=${camp.latitude},${camp.longitude}&hl=en&z=14&output=embed`
+        : `https://maps.google.com/maps?q=${encodeURIComponent(`${camp.title} ${camp.location || ''} ${camp.region || ''}`.trim())}&hl=en&z=13&output=embed`;
+    const directionsUrl = hasCoords
+        ? `https://www.google.com/maps/dir/?api=1&destination=${camp.latitude},${camp.longitude}`
+        : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${camp.title}, ${camp.location || ''}, ${camp.region || ''}`.trim())}`;
+    const googleMapsSearchUrl = hasCoords
+        ? `https://www.google.com/maps/search/?api=1&query=${camp.latitude},${camp.longitude}`
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${camp.title} ${camp.location || ''}`.trim())}`;
+    const typeMeta = resolvePropertyType(camp.propertyTypeSlug || camp.propertyType?.slug || camp.category, camp.title);
+    const availableRooms = camp.rooms && camp.rooms.length > 0 ? camp.rooms : [
+        {
+            id: `${camp.id}-primary-unit`,
+            name: `${camp.title} · ${typeMeta.unitTerm}`,
+            type: typeMeta.slug,
+            capacity: '2 Guests',
+            price: camp.price,
+            pricePerPerson: camp.price,
+            features: typeMeta.defaultAmenities.slice(0, 3),
+            inventoryType: typeMeta.id === 'campsite' ? 'GLAMP_DOME' : 'PRIVATE_UNIT',
+            bedConfig: typeMeta.id === 'hostel' ? '1 Single Bed' : '1 King Bed',
+            bathroomType: 'Ensuite Private Bathroom',
+            pricingModel: typeMeta.id === 'hostel' ? 'PER_BED' : (typeMeta.id === 'campsite' ? 'per_guest_night' : 'PER_ROOM'),
+            availableUnits: 1
+        }
+    ];
+
+    const isDormRoom = (r) => {
+        if (!r) return false;
+        const name = String(r.name || r.title || '').toLowerCase();
+        const inv = String(r.inventoryType || '').toUpperCase();
+        const model = String(r.pricingModel || '').toUpperCase();
+        return (
+            inv === 'DORM_BED' ||
+            inv === 'DORM' ||
+            model === 'PER_BED' ||
+            name.includes('dorm') ||
+            name.includes('bunk') ||
+            name.includes('bed in')
+        );
+    };
+
+    const currentRoom = availableRooms.find(r => r.id === selectedRoomId) || availableRooms[0];
+    const currentRoomIsDorm = isDormRoom(currentRoom);
+    const roomPrice = currentRoom?.price || currentRoom?.pricePerPerson || camp.price || 2499;
+
+    // PMS-driven: show "by Aanandham.Stays" badge if the property brand/category indicates a Stays property
+    // Falls back to checking category from PMS (all Aanandham properties qualify as verified stays)
+    const isAanandhamStays = Boolean(
+        camp.brand === 'aanandham_stays' ||
+        String(camp.category || '').toLowerCase().includes('stays') ||
+        String(camp.category || '').toLowerCase().includes('resort') ||
+        String(camp.category || '').toLowerCase().includes('hotel') ||
+        // For properties without explicit brand field, all Aanandham properties are verified stays
+        Boolean(camp.id)
+    );
+    const capacityNum = parseRoomCapacity(currentRoom?.capacity || currentRoom?.guestCapacity);
+
+    // Dynamic maximum capacity calculation based on live room inventory and configuration
+    const maxAllowedCapacity = useMemo(() => {
+        if (!currentRoom) return 10;
+        const liveRoom = liveInventory?.[currentRoom.id];
+        if (currentRoomIsDorm) {
+            // Dorm room: Each unit represents 1 bed
+            if (liveRoom && typeof liveRoom.availableUnits === 'number') {
+                return Math.max(0, liveRoom.availableUnits);
+            }
+            const units = Number(currentRoom.totalUnits) || 0;
+            const capDigits = parseInt(String(currentRoom.capacity || '').match(/\d+/)?.[0] || '0', 10);
+            const nameDigits = parseInt(String(currentRoom.name || '').match(/(\d+)\s*[- ]*(bed|bunk|person|sharing)/i)?.[1] || String(currentRoom.name || '').match(/\d+/)?.[0] || '0', 10);
+            if (units > 1) return units;
+            if (capDigits > 0) return capDigits;
+            if (nameDigits > 0) return nameDigits;
+            return 10;
+        } else {
+            // Private room / cabin / suite / tent
+            const unitCap = parseRoomCapacity(currentRoom.capacity || currentRoom.guestCapacity || 2);
+            const availableUnits = liveRoom && typeof liveRoom.availableUnits === 'number'
+                ? liveRoom.availableUnits
+                : Math.max(1, Number(currentRoom.totalUnits) || 3);
+            return unitCap * availableUnits;
+        }
+    }, [currentRoom, currentRoomIsDorm, liveInventory]);
+
+    // Enforce dynamic capacity clamp whenever selected room changes or guest count exceeds capacity
+    useEffect(() => {
+        if (guestsCount > maxAllowedCapacity) {
+            setGuestsCount(maxAllowedCapacity);
+            setCapacityWarning(true);
+        } else if (guestsCount < maxAllowedCapacity) {
+            setCapacityWarning(false);
+        }
+    }, [selectedRoomId, maxAllowedCapacity, guestsCount]);
+
+    const handleIncrementGuests = () => {
+        if (guestsCount >= maxAllowedCapacity) {
+            setCapacityWarning(true);
+            return;
+        }
+        const next = Math.min(maxAllowedCapacity, guestsCount + 1);
+        setGuestsCount(next);
+        setCustomUnits(null);
+        if (next >= maxAllowedCapacity) {
+            setCapacityWarning(true);
+        }
+    };
+
+    const handleDecrementGuests = () => {
+        const next = Math.max(1, guestsCount - 1);
+        setGuestsCount(next);
+        setCustomUnits(null);
+        setCapacityWarning(false);
+    };
+
+    const calculatedUnits = currentRoomIsDorm ? 1 : Math.ceil(guestsCount / capacityNum);
+    const effectiveUnits = customUnits !== null ? customUnits : calculatedUnits;
+    const totalCapacity = effectiveUnits * capacityNum;
+    const isPerRoomPricing = !currentRoomIsDorm && (
+        currentRoom?.pricingModel === 'PER_ROOM' ||
+        currentRoom?.pricingModel === 'per_room_night' ||
+        (typeMeta.id !== 'campsite' && typeMeta.id !== 'hostel' && currentRoom?.pricingModel !== 'PER_BED')
+    );
+    const stayNights = parseStayNights(selectedDate);
+    const baseTotalCalculated = (isPerRoomPricing ? (effectiveUnits * roomPrice) : (guestsCount * roomPrice)) * stayNights;
+    const discount = applyDiscounts({ baseTotal: baseTotalCalculated, guests: guestsCount, campsiteId: camp?.id, discounts });
+    const estimatedTotal = discount.discountedTotal;
+    const discountLabel = discount.discountLabel;
+    const discountAmount = discount.discountAmount;
+    const nearbyCamps = allCamps.filter(c => c.id !== camp.id).slice(0, 3);
+
+    const locLower = `${camp?.location || ''} ${camp?.region || ''} ${camp?.title || ''}`.toLowerCase();
+    const isHimachal = locLower.includes('kasol') || locLower.includes('himachal') || locLower.includes('manali') || locLower.includes('jibhi') || locLower.includes('tirthan') || locLower.includes('spiti') || locLower.includes('parvati') || locLower.includes('kalga');
+
+    // ── Robust normalization of Basecamp Perks from PMS ──
+    const normalizedAmenities = useMemo(() => {
+        let raw = camp?.amenities;
+        if (typeof raw === 'string') {
+            try {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) raw = parsed;
+                else raw = raw.split(',').map(s => s.trim()).filter(Boolean);
+            } catch {
+                raw = raw.split(',').map(s => s.trim()).filter(Boolean);
+            }
+        }
+        if (Array.isArray(raw) && raw.length > 0) {
+            const valid = raw
+                .filter(a => a && (typeof a === 'string' ? a.trim() : a.enabled !== false))
+                .map((a, idx) => {
+                    const name = typeof a === 'string' ? a.trim() : (a.name || a.title || 'Amenity');
+                    const num = String(idx + 1).padStart(2, '0');
+                    return {
+                        num,
+                        tag: typeof a === 'object' && a.tag ? a.tag : 'Verified Amenity',
+                        title: name,
+                        desc: typeof a === 'object' && a.desc ? a.desc : `Verified amenity facility provided at ${camp?.title || 'the stay'}.`
+                    };
+                })
+                .filter(a => Boolean(a.title));
+            if (valid.length > 0) return valid;
+        }
+        return [];
+    }, [camp?.amenities, camp?.title]);
+
+    // ── Robust normalization of Stay Timeline / Schedule from PMS ──
+    const normalizedItinerary = useMemo(() => {
+        if (Array.isArray(camp?.itinerary) && camp.itinerary.length > 0) {
+            const valid = camp.itinerary.filter(d => d && (Array.isArray(d.items) ? d.items.length > 0 : Boolean(d.title && d.title.trim())));
+            if (valid.length > 0) return valid;
+        }
+        if (camp?.cancellationPolicy && typeof camp.cancellationPolicy === 'object' && Array.isArray(camp.cancellationPolicy.itinerary)) {
+            const valid = camp.cancellationPolicy.itinerary.filter(d => d && (Array.isArray(d.items) ? d.items.length > 0 : Boolean(d.title && d.title.trim())));
+            if (valid.length > 0) return valid;
+        }
+        return [];
+    }, [camp?.itinerary, camp?.cancellationPolicy]);
+
+    // ── Synchronize active stay context for GlobalActionHub & Sticky Bar ──
+    useEffect(() => {
+        if (!camp) return;
+        const context = {
+            camp,
+            selectedRoomId,
+            currentRoom,
+            selectedDate,
+            guestsCount,
+            customUnits: effectiveUnits,
+            roomPrice,
+            estimatedTotal
+        };
+        window.__AANANDHAM_ACTIVE_CAMP_CONTEXT__ = context;
+        window.dispatchEvent(new CustomEvent('aanandham_camp_context_change', { detail: context }));
+
+        return () => {
+            if (window.__AANANDHAM_ACTIVE_CAMP_CONTEXT__?.camp?.id === camp?.id) {
+                window.__AANANDHAM_ACTIVE_CAMP_CONTEXT__ = null;
+                window.dispatchEvent(new CustomEvent('aanandham_camp_context_change', { detail: null }));
+            }
+        };
+    }, [camp, selectedRoomId, currentRoom, selectedDate, guestsCount, effectiveUnits, roomPrice, estimatedTotal]);
+
+    // ── Listen for Global Booking Open triggers (from Sticky Bar or Header) ──
+    useEffect(() => {
+        const handleOpenBooking = (e) => {
+            e.preventDefault();
+            if (e.detail?.selectedRoomId) {
+                setSelectedRoomId(e.detail.selectedRoomId);
+            }
+            if (e.detail?.selectedDate) {
+                setSelectedDate(e.detail.selectedDate);
+            }
+            if (e.detail?.guestsCount) {
+                setGuestsCount(e.detail.guestsCount);
+            }
+            if (e.detail?.customUnits !== undefined && e.detail?.customUnits !== null) {
+                setCustomUnits(e.detail.customUnits);
+            }
+            setIsBookingModalOpen(true);
+        };
+        window.addEventListener('aanandham_open_booking', handleOpenBooking);
+        return () => window.removeEventListener('aanandham_open_booking', handleOpenBooking);
+    }, []);
+
+    const handleShare = async () => {
+        const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+        const shareData = {
+            title: `${camp.title} | Aanandham.go Wilderness Camps`,
+            text: `Check out this verified campsite at ${camp.altitude} in ${camp.location}!`,
+            url: shareUrl
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+                return;
+            } catch (err) {}
+        }
+
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            setShareToast('✓ Campsite link copied to clipboard!');
+            if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+            toastTimerRef.current = setTimeout(() => setShareToast(''), 3000);
+        } catch (err) {
+            window.open(waLink(`Check out this Kerala campsite: ${camp.title} - ${shareUrl}`), '_blank');
+        }
+    };
+
+return (
+    <div style={{ minHeight: '100vh', background: '#F8F9F5', color: '#121613' }}>
+
+    {/* FAQPage JSON-LD for rich results */}
+    {camp?.faqs && camp.faqs.length > 0 && (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: camp.faqs.map((f) => ({
+              '@type': 'Question',
+              name: f.q,
+              acceptedAnswer: { '@type': 'Answer', text: f.a },
+            })),
+          }),
+        }}
+      />
+    )}
+
+    {/* ── HEADER ── */}
+    <SiteHeader transparentOnTop={false} activePage="camps" />
+
+            <main style={{ paddingBottom: '120px' }}>
+                
+                {/* ── BREADCRUMB & TITLE BAR ── */}
+                <section className="camp-hero" style={{ background: '#101E13', color: '#FFFFFF', padding: 'clamp(105px, 11vw, 130px) clamp(20px, 4vw, 48px) clamp(34px, 4vw, 46px)' }}>
+                    <div style={{ maxWidth: '1440px', margin: '0 auto', width: '100%' }}>
+                        {/* Breadcrumbs */}
+                        <div className="camp-hero-breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#C5D8C8', marginBottom: '16px', flexWrap: 'wrap', fontWeight: '600' }}>
+                            <Link href="/" style={{ color: '#C5D8C8', textDecoration: 'none', transition: 'color 0.2s' }}>Home</Link>
+                            <span style={{ color: '#6A7D6E' }}>/</span>
+                            <Link href="/camps" style={{ color: '#C5D8C8', textDecoration: 'none', transition: 'color 0.2s' }}>Campsites</Link>
+                            <span style={{ color: '#6A7D6E' }}>/</span>
+                            <span className="camp-hero-breadcrumb-current" style={{ color: '#D5ED55', fontWeight: '800' }}>{camp.title}</span>
+                        </div>
+
+                        {/* Title & Actions Bar */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px' }}>
+                            <div>
+                                <div className="camp-hero-badges" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                                    {isAanandhamStays ? (
+                                        <span className="camp-hero-badge" style={{
+                                            background: 'rgba(213, 237, 85, 0.15)',
+                                            color: '#D5ED55',
+                                            fontSize: '11.5px',
+                                            fontWeight: '900',
+                                            padding: '5px 12px',
+                                            borderRadius: '999px',
+                                            border: '1px solid rgba(213, 237, 85, 0.4)',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '5px'
+                                        }}>
+                                            <span style={{ width: '13px', height: '13px', borderRadius: '50%', background: '#D5ED55', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <Check size={8} color="#121613" strokeWidth={3.5} />
+                                            </span>
+                                            by Aanandham.Stays
+                                        </span>
+                                    ) : (
+                                        <span className="camp-hero-badge" style={{
+                                            background: '#121613',
+                                            color: '#D5ED55',
+                                            fontSize: '11.5px',
+                                            fontWeight: '900',
+                                            padding: '5px 12px',
+                                            borderRadius: '999px',
+                                            border: '1px solid rgba(213, 237, 85, 0.3)',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '5px'
+                                        }}>
+                                            <span style={{ width: '13px', height: '13px', borderRadius: '50%', background: '#D5ED55', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <Check size={8} color="#121613" strokeWidth={3.5} />
+                                            </span>
+                                            Verified
+                                        </span>
+                                    )}
+                                    {camp.altitude ? (
+                                        <span className="camp-hero-badge" style={{ background: '#E5A93B', color: '#0B150E', fontSize: '12px', fontWeight: '900', padding: '5px 14px', borderRadius: '999px', letterSpacing: '0.3px', boxShadow: '0 2px 8px rgba(229,169,59,0.3)' }}>
+                                            {camp.altitude}
+                                        </span>
+                                    ) : (
+                                        <span className="camp-hero-badge" style={{ background: 'rgba(255,255,255,0.08)', color: '#A2B6A6', fontSize: '12px', fontWeight: '700', padding: '5px 14px', borderRadius: '999px' }}>
+                                            Altitude Unavailable
+                                        </span>
+                                    )}
+                                    <span className="camp-hero-badge" style={{ background: 'rgba(213, 237, 85, 0.2)', color: '#D5ED55', fontSize: '12px', fontWeight: '800', padding: '5px 14px', borderRadius: '999px', border: '1px solid rgba(213, 237, 85, 0.4)' }}>
+                                        ★ {camp.rating ? Number(camp.rating).toFixed(1) : 'Unrated'} {camp.reviewsCount ? `(${camp.reviewsCount} verified campers)` : '(Verified Stay)'}
+                                    </span>
+                                    {camp.tag && (
+                                        <span className="camp-hero-badge" style={{ background: 'rgba(255,255,255,0.12)', color: '#FFFFFF', fontSize: '11.5px', fontWeight: '800', padding: '5px 12px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.18)' }}>
+                                            {camp.tag}
+                                        </span>
+                                    )}
+                                    {camp.archived && (
+                                        <span className="camp-hero-badge" style={{ background: '#EF4444', color: '#FFFFFF', fontSize: '11.5px', fontWeight: '900', padding: '5px 14px', borderRadius: '999px', letterSpacing: '0.4px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                            ⚠️ ARCHIVED SANCTUARY · EXPEDITIONS SUSPENDED
+                                        </span>
+                                    )}
+                                </div>
+
+                                <h1 className="camp-hero-title" style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(28px, 4.5vw, 44px)', fontWeight: '800', margin: '0 0 12px', color: '#FFFFFF', letterSpacing: '-0.025em', lineHeight: 1.15 }}>
+                                    {camp.title}
+                                </h1>
+
+                                <div className="camp-hero-info" style={{ display: 'flex', alignItems: 'center', gap: '20px', fontSize: '14px', color: '#C5D8C8', flexWrap: 'wrap', fontWeight: '600' }}>
+                                    <span style={ROW_GAP_6}>
+                                        <MapPin size={16} color="#D5ED55" />
+                                        <span>{camp.location || camp.region || 'Location Unavailable'}</span>
+                                    </span>
+                                    <span style={ROW_GAP_6}>
+                                        <Clock size={16} color="#D5ED55" />
+                                        <span>{camp.duration || (camp.checkInTime || camp.checkOutTime ? `In ${camp.checkInTime || 'N/A'} · Out ${camp.checkOutTime || 'N/A'}` : 'Schedule Unavailable')}</span>
+                                    </span>
+                                    {camp.difficulty && (
+                                        <span style={ROW_GAP_6}>
+                                            <Compass size={16} color="#D5ED55" />
+                                            <span>{camp.difficulty}</span>
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Like & Share Action Buttons */}
+                            <div className="camp-hero-actions" style={{ display: 'flex', gap: '10px' }}>
+                                <button
+                                    onClick={handleToggleWishlist}
+                                    className="camp-hero-btn"
+                                    style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        padding: '10px 18px',
+                                        borderRadius: '999px',
+                                        background: isLiked ? '#EF4444' : 'rgba(255, 255, 255, 0.1)',
+                                        border: isLiked ? '1px solid #EF4444' : '1px solid rgba(255, 255, 255, 0.2)',
+                                        color: '#FFFFFF',
+                                        fontSize: '13px',
+                                        fontWeight: '800',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                >
+                                    <Heart size={16} fill={isLiked ? '#FFFFFF' : 'none'} color="#FFFFFF" strokeWidth={2.5} />
+                                    <span>{isLiked ? 'Saved' : 'Save'}</span>
+                                </button>
+
+                                <button
+                                    onClick={handleShare}
+                                    className="camp-hero-btn"
+                                    style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        padding: '10px 18px',
+                                        borderRadius: '999px',
+                                        background: 'rgba(255, 255, 255, 0.1)',
+                                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                                        color: '#FFFFFF',
+                                        fontSize: '13px',
+                                        fontWeight: '800',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    <Share2 size={16} color="#FFFFFF" strokeWidth={2.5} />
+                                    <span>Share</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── PHOTO GALLERY MOSAIC SECTION (RESPONSIVE) ── */}
+                {gallery.length === 0 ? (
+                    <section style={{ maxWidth: '1440px', margin: '32px auto 0', padding: '0 clamp(20px, 4vw, 48px)' }}>
+                        <div style={{
+                            height: '200px',
+                            borderRadius: '24px',
+                            background: '#F1F3EC',
+                            border: '1.5px dashed rgba(18, 22, 19, 0.15)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            color: '#7D8880'
+                        }}>
+                            <ImageOff size={32} color="#9CA3AF" />
+                            <div style={{ fontSize: '13.5px', fontWeight: '800', color: '#121613' }}>No property photos uploaded yet</div>
+                            <div style={{ fontSize: '11.5px', color: '#6A7D6E' }}>Live verified photos for this stay will appear here once uploaded in PMS</div>
+                        </div>
+                    </section>
+                ) : gallery.length === 1 ? (
+                    <section style={{ maxWidth: '1440px', margin: '32px auto 0', padding: '0 clamp(20px, 4vw, 48px)' }}>
+                        <div
+                            onClick={() => openLightbox(gallery, 0, camp.title, 'Property Gallery')}
+                            className="card-img-zoom"
+                            style={{ position: 'relative', height: 'clamp(260px, 40vw, 440px)', borderRadius: '24px', overflow: 'hidden', cursor: 'pointer' }}
+                        >
+                            <AssetImage
+                                src={gallery[0]}
+                                alt={`${camp.title} Main View`}
+                                fill
+                                priority
+                                sizes="(max-width: 768px) 100vw, 90vw"
+                            />
+                            <div style={{ position: 'absolute', bottom: '16px', left: '16px', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)', padding: '6px 14px', borderRadius: '999px', color: '#FFFFFF', fontSize: '12px', fontWeight: '800', zIndex: 2 }}>
+                                <span style={ROW_GAP_6}><Camera size={13} /> View Photo</span>
+                            </div>
+                        </div>
+                    </section>
+                ) : (
+                    <section style={{ maxWidth: '1440px', margin: '32px auto 0', padding: '0 clamp(20px, 4vw, 48px)' }}>
+                        <div className="camp-gallery-mosaic">
+                            {/* Main Featured Photo (Left Large) */}
+                            <div
+                                onClick={() => openLightbox(gallery, 0, camp.title, 'Property Gallery')}
+                                className="gallery-tile-main card-img-zoom"
+                                style={{ position: 'relative' }}
+                            >
+                                <AssetImage
+                                    src={gallery[0]}
+                                    alt={`${camp.title} Main View`}
+                                    fill
+                                    priority
+                                    sizes="(max-width: 768px) 100vw, 60vw"
+                                />
+                                <div style={{ position: 'absolute', bottom: '16px', left: '16px', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)', padding: '6px 14px', borderRadius: '999px', color: '#FFFFFF', fontSize: '12px', fontWeight: '800', zIndex: 2 }}>
+                                    <span style={ROW_GAP_6}><Camera size={13} /> View Gallery ({gallery.length} photos)</span>
+                                </div>
+                            </div>
+
+                            {/* Sub Photo 1 (Top Right) */}
+                            <div
+                                onClick={() => openLightbox(gallery, 1 % gallery.length, camp.title, 'Property Gallery')}
+                                className="gallery-tile-top card-img-zoom"
+                                style={{ position: 'relative' }}
+                            >
+                                <AssetImage
+                                    src={gallery[1]}
+                                    alt={`${camp.title} Unit`}
+                                    fill
+                                    sizes="(max-width: 768px) 50vw, 25vw"
+                                />
+                            </div>
+
+                            {/* Sub Photo 2 (Bottom Right 1) */}
+                            <div
+                                onClick={() => openLightbox(gallery, 2 % gallery.length, camp.title, 'Property Gallery')}
+                                className="gallery-tile-bot-1 card-img-zoom"
+                                style={{ position: 'relative' }}
+                            >
+                                <AssetImage
+                                    src={gallery[2] || gallery[1]}
+                                    alt={`${camp.title} Exterior`}
+                                    fill
+                                    sizes="(max-width: 768px) 50vw, 25vw"
+                                />
+                            </div>
+
+                            {/* Sub Photo 3 (Bottom Right 2 with View All overlay) */}
+                            <div
+                                onClick={() => openLightbox(gallery, 3 % gallery.length, camp.title, 'Property Gallery')}
+                                className="gallery-tile-bot-2 card-img-zoom"
+                                style={{ position: 'relative' }}
+                            >
+                                <AssetImage
+                                    src={gallery[3] || gallery[1]}
+                                    alt={`${camp.title} View`}
+                                    fill
+                                    sizes="(max-width: 768px) 50vw, 25vw"
+                                    style={{ opacity: gallery.length > 4 ? 0.8 : 1 }}
+                                />
+                                {gallery.length > 4 && (
+                                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D5ED55', fontWeight: '800', fontSize: '13px', textAlign: 'center', padding: '10px', zIndex: 2, background: 'rgba(0,0,0,0.35)' }}>
+                                        +{gallery.length - 4} More
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* ── TWO-COLUMN EXPEDITION DETAILS & SMART STAY BOOKING ENGINE ── */}
+                <section style={{ maxWidth: '1560px', margin: '48px auto 0', padding: '0 clamp(20px, 4vw, 48px)' }}>
+                    <div className="camp-detail-layout">
+                        
+                        {/* ── LEFT COLUMN: CAMPSITE CONTENT & SPECS ── */}
+                        <div>
+                            
+                            {/* SECTION 1: HIGHLIGHTS & DESCRIPTION */}
+                            <div className="camp-section-card">
+                                <div className="star-badge" style={{ marginBottom: '8px' }}>
+                                    <span className="star-icon">★</span> EXPEDITION OVERVIEW
+                                </div>
+                                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '24px', fontWeight: '800', margin: '0 0 16px', color: '#121613' }}>
+                                    About This Wilderness Basecamp
+                                </h2>
+                                <p style={{ fontSize: '15px', color: '#3A443E', lineHeight: 1.75, margin: '0 0 24px' }}>
+                                    {camp.description || 'Property description unavailable (Not provided in PMS).'}
+                                </p>
+
+                                {/* Highlights Chips (Lucide Icons) */}
+                                <div>
+                                    <h3 style={{ fontSize: '13px', fontWeight: '800', color: '#7D8880', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '0 0 12px' }}>
+                                        Key Highlights & Experiences
+                                    </h3>
+                                    {safeHighlights.length > 0 ? (
+                                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                            {safeHighlights.map((hl, hidx) => (
+                                                <div key={hidx} style={{ background: '#F1F3EC', padding: '8px 14px', borderRadius: '10px', fontSize: '13px', fontWeight: '700', color: '#121613', display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
+                                                    <LucideAmenityIcon name={hl} size={14} color="#166534" />
+                                                    <span>{hl}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div style={{ fontSize: '13px', color: '#7D8880', fontStyle: 'italic' }}>
+                                            Highlights unavailable (Not specified in PMS)
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* SECTION 2: LODGING ROOM TYPES & TENT SELECTION */}
+                            <div className="camp-section-card">
+                                <div className="star-badge" style={{ marginBottom: '8px' }}>
+                                    <span className="star-icon">★</span> {typeMeta.badge?.toUpperCase() || 'ACCOMMODATION'}
+                                </div>
+                                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '24px', fontWeight: '800', margin: '0 0 20px', color: '#121613' }}>
+                                    {typeMeta.unitsPlural || 'Available Rooms & Suites'}
+                                </h2>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                    {availableRooms.map((room) => {
+                                        const isSelected = selectedRoomId === room.id;
+                                        const roomIsDorm = isDormRoom(room);
+                                        const liveRoom = liveInventory?.[room.id];
+                                        const invMeta = getInventoryTypeMeta(room.inventoryType, room.name);
+                                        const roomBadge = roomIsDorm ? 'Shared Dorm' : (invMeta?.badge || room.type?.toUpperCase() || typeMeta.unitTerm);
+                                        const isRoomLevel = !roomIsDorm && (
+                                            room.pricingModel === 'PER_ROOM' ||
+                                            room.pricingModel === 'per_room_night' ||
+                                            (typeMeta.id !== 'campsite' && typeMeta.id !== 'hostel' && room.pricingModel !== 'PER_BED')
+                                        );
+                                        const priceSubtext = roomIsDorm
+                                            ? 'Per Bed / Night'
+                                            : (isRoomLevel ? 'Per Room / Night' : (typeMeta.id === 'campsite' ? 'Per Camper' : 'Per Night'));
+
+                                        return (
+                                            <div
+                                                key={room.id}
+                                                onClick={() => { setSelectedRoomId(room.id); setCustomUnits(null); }}
+                                                className="room-card"
+                                                style={{
+                                                    borderRadius: '18px',
+                                                    border: isSelected ? '2px solid #166534' : '1px solid rgba(18, 22, 19, 0.1)',
+                                                    background: isSelected ? '#F4F8F4' : '#FFFFFF',
+                                                    padding: '20px',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.2s ease',
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+                                                    gap: '16px',
+                                                    flexWrap: 'wrap'
+                                                }}
+                                            >
+                                                {/* Lodging Photo Showcase with Multi-Image Gallery Support */}
+                                                {(() => {
+                                                    const rawRoomImages = Array.isArray(room.images) 
+                                                        ? room.images.filter(isRealPhoto) 
+                                                        : (isRealPhoto(room.image) ? [room.image] : []);
+                                                    
+                                                    if (rawRoomImages.length > 0) {
+                                                        return (
+                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0 }}>
+                                                                <div
+                                                                    className="room-card-media card-img-zoom"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        openLightbox(rawRoomImages, 0, room.name, `${camp.title} · ${roomBadge}`);
+                                                                    }}
+                                                                    style={{
+                                                                        width: 'clamp(120px, 18vw, 150px)',
+                                                                        height: '110px',
+                                                                        borderRadius: '14px',
+                                                                        overflow: 'hidden',
+                                                                        position: 'relative',
+                                                                        cursor: 'pointer',
+                                                                        background: '#EAECE4'
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={rawRoomImages[0]}
+                                                                        alt={`${camp.title} - ${room.name}`}
+                                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                                        loading="lazy"
+                                                                        decoding="async"
+                                                                        onError={(e) => {
+                                                                            e.currentTarget.style.display = 'none';
+                                                                            const fallback = document.createElement('div');
+                                                                            fallback.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#7D8880;gap:4px;background:#F1F3EC;';
+                                                                            fallback.innerHTML = '<span style="font-size:11px;font-weight:700;">No preview</span>';
+                                                                            e.currentTarget.parentElement.appendChild(fallback);
+                                                                        }}
+                                                                    />
+                                                                    <div style={{
+                                                                        position: 'absolute',
+                                                                        bottom: '6px',
+                                                                        right: '6px',
+                                                                        background: 'rgba(0,0,0,0.65)',
+                                                                        backdropFilter: 'blur(4px)',
+                                                                        color: '#FFFFFF',
+                                                                        fontSize: '10px',
+                                                                        fontWeight: '700',
+                                                                        padding: '2px 7px',
+                                                                        borderRadius: '6px',
+                                                                        display: 'inline-flex',
+                                                                        alignItems: 'center',
+                                                                        gap: '3px'
+                                                                    }}>
+                                                                        <Camera size={10} />
+                                                                        <span>{rawRoomImages.length > 1 ? `${rawRoomImages.length} Photos` : 'Photo'}</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Multi-Photo Thumbnail Strip */}
+                                                                {rawRoomImages.length > 1 && (
+                                                                    <div style={{ display: 'flex', gap: '4px', maxWidth: '150px' }}>
+                                                                        {rawRoomImages.slice(0, 3).map((thumbUrl, tIdx) => (
+                                                                            <div
+                                                                                key={tIdx}
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    openLightbox(rawRoomImages, tIdx, room.name, `${camp.title} · ${roomBadge}`);
+                                                                                }}
+                                                                                style={{
+                                                                                    width: '32px',
+                                                                                    height: '24px',
+                                                                                    borderRadius: '4px',
+                                                                                    overflow: 'hidden',
+                                                                                    border: '1px solid rgba(18,22,19,0.15)',
+                                                                                    cursor: 'pointer'
+                                                                                }}
+                                                                            >
+                                                                                <img src={thumbUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                                            </div>
+                                                                        ))}
+                                                                        {rawRoomImages.length > 3 && (
+                                                                            <div
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    openLightbox(rawRoomImages, 3, room.name, `${camp.title} · ${roomBadge}`);
+                                                                                }}
+                                                                                style={{
+                                                                                    width: '32px',
+                                                                                    height: '24px',
+                                                                                    borderRadius: '4px',
+                                                                                    background: '#121613',
+                                                                                    color: '#D5ED55',
+                                                                                    fontSize: '9.5px',
+                                                                                    fontWeight: '800',
+                                                                                    display: 'flex',
+                                                                                    alignItems: 'center',
+                                                                                    justifyContent: 'center',
+                                                                                    cursor: 'pointer'
+                                                                                }}
+                                                                            >
+                                                                                +{rawRoomImages.length - 3}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    }
+
+                                                    return (
+                                                        <div
+                                                            className="room-card-media"
+                                                            style={{
+                                                                width: 'clamp(120px, 18vw, 150px)',
+                                                                height: '110px',
+                                                                borderRadius: '14px',
+                                                                background: '#F1F3EC',
+                                                                border: '1px dashed rgba(18, 22, 19, 0.15)',
+                                                                display: 'flex',
+                                                                flexDirection: 'column',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                gap: '6px',
+                                                                flexShrink: 0,
+                                                                color: '#7D8880'
+                                                            }}
+                                                            title="No room photo provided"
+                                                        >
+                                                            <ImageOff size={22} color="#9CA3AF" />
+                                                            <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.2px' }}>No preview</span>
+                                                        </div>
+                                                    );
+                                                })()}
+
+                                                <div className="room-card-main" style={{ flex: 1, minWidth: '200px' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                                                        <span style={{ background: '#121613', color: '#D5ED55', fontSize: '10.5px', fontWeight: '800', padding: '3px 8px', borderRadius: '6px' }}>
+                                                            {roomBadge}
+                                                        </span>
+                                                        {liveRoom && (
+                                                            <span style={{
+                                                                fontSize: '11px',
+                                                                fontWeight: '800',
+                                                                padding: '2px 8px',
+                                                                borderRadius: '6px',
+                                                                background: liveRoom.availableUnits === 0 ? '#FEF2F2' : (liveRoom.availableUnits <= 2 ? '#FFFBEB' : '#F0FDF4'),
+                                                                color: liveRoom.availableUnits === 0 ? '#DC2626' : (liveRoom.availableUnits <= 2 ? '#B45309' : '#166534'),
+                                                                border: `1px solid ${liveRoom.availableUnits === 0 ? '#FECACA' : (liveRoom.availableUnits <= 2 ? '#FDE68A' : '#BBF7D0')}`
+                                                            }}>
+                                                                {liveRoom.availableUnits === 0 ? 'Sold Out' : (
+                                                                    roomIsDorm
+                                                                        ? `${liveRoom.availableUnits} of ${liveRoom.totalUnits || 10} Beds Left`
+                                                                        : `${liveRoom.availableUnits} of ${liveRoom.totalUnits || 5} Units Left`
+                                                                )}
+                                                            </span>
+                                                        )}
+                                                        <span style={{ fontSize: '12px', fontWeight: '700', color: '#59655D', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                                            <Users size={13} color="#166534" />
+                                                            <span>{roomIsDorm ? (room.capacity && room.capacity.toLowerCase().includes('bed') ? room.capacity : '10 Beds') : `Capacity: ${room.guestCapacity || room.capacity || '2 Persons'}`}</span>
+                                                        </span>
+                                                        {room.bedConfig && (
+                                                            <span style={{ fontSize: '11px', fontWeight: '700', color: '#166534', background: '#DCFCE7', padding: '2px 7px', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                                                <BedDouble size={11} color="#166534" />
+                                                                <span>{room.bedConfig}</span>
+                                                            </span>
+                                                        )}
+                                                        {room.bathroomType && (
+                                                            <span style={{ fontSize: '11px', fontWeight: '700', color: '#0369A1', background: '#E0F2FE', padding: '2px 7px', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                                                <Bath size={11} color="#0369A1" />
+                                                                <span>{room.bathroomType === 'ATTACHED' ? 'Attached Bath' : (room.bathroomType === 'COMMON' ? 'Shared Bath' : room.bathroomType)}</span>
+                                                            </span>
+                                                        )}
+                                                        {(room.roomSizeSqFt || room.roomSize) && (
+                                                            <span style={{ fontSize: '11px', fontWeight: '600', color: '#4B5563', background: '#F1F3EC', padding: '2px 7px', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                                                <Maximize2 size={11} color="#4B5563" />
+                                                                <span>{room.roomSizeSqFt ? `${room.roomSizeSqFt} sq ft` : `${room.roomSize} sq ft`}</span>
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '17px', fontWeight: '800', margin: '0 0 6px', color: '#121613' }}>
+                                                        {room.name}
+                                                    </h3>
+                                                    {(() => {
+                                                        const feats = Array.isArray(room.features) 
+                                                            ? room.features 
+                                                            : (typeof room.features === 'string' 
+                                                                ? room.features.split(',').map(s => s.trim()).filter(Boolean) 
+                                                                : (Array.isArray(room.amenities) ? room.amenities : []));
+                                                        if (!feats || feats.length === 0) return null;
+                                                        return (
+                                                            <div className="room-feats" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                                                                {feats.map((feat, fidx) => (
+                                                                    <span key={fidx} style={{ fontSize: '11px', color: '#59655D', background: '#F8F9F5', padding: '2px 8px', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                                                        <LucideAmenityIcon name={feat} size={11} color="#166534" />
+                                                                        <span>{feat}</span>
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        );
+                                                    })()}
+                                                </div>
+
+                                                <div className="room-price-row" style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                                                    <div style={{ textAlign: 'right' }}>
+                                                        <span style={{ fontSize: '10px', color: '#7D8880', fontWeight: '700', textTransform: 'uppercase', display: 'block' }}>{priceSubtext}</span>
+                                                        <span style={{ fontFamily: 'var(--font-heading)', fontSize: '20px', fontWeight: '900', color: '#121613', whiteSpace: 'nowrap' }}>
+                                                            ₹{((liveRoom && typeof liveRoom.price === 'number') ? liveRoom.price : (room.price || room.pricePerPerson || camp.price || 0)).toLocaleString('en-IN')}
+                                                        </span>
+                                                    </div>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setSelectedRoomId(room.id);
+                                                                setCustomUnits(null);
+                                                            }}
+                                                            style={{
+                                                                padding: '8px 12px',
+                                                                borderRadius: '10px',
+                                                                background: isSelected ? 'rgba(22, 101, 52, 0.1)' : '#F1F3EC',
+                                                                color: isSelected ? '#166534' : '#121613',
+                                                                border: isSelected ? '1.5px solid #166534' : '1px solid rgba(18,22,19,0.15)',
+                                                                fontSize: '12px',
+                                                                fontWeight: '800',
+                                                                cursor: 'pointer',
+                                                                whiteSpace: 'nowrap'
+                                                            }}
+                                                        >
+                                                            {isSelected ? '✓ Selected' : 'Select'}
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setSelectedRoomId(room.id);
+                                                                setCustomUnits(null);
+                                                                setIsBookingModalOpen(true);
+                                                            }}
+                                                            className="btn-lime"
+                                                            style={{
+                                                                padding: '8px 14px',
+                                                                borderRadius: '10px',
+                                                                fontSize: '12px',
+                                                                fontWeight: '900',
+                                                                cursor: 'pointer',
+                                                                whiteSpace: 'nowrap',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '4px',
+                                                                boxShadow: '0 2px 8px rgba(213,237,85,0.4)'
+                                                            }}
+                                                        >
+                                                            <span>Book Stay</span>
+                                                            <span>→</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* SECTION 3: INCLUDED AMENITIES & FACILITIES */}
+                            <div className="camp-section-card">
+                                <div className="star-badge" style={{ marginBottom: '8px' }}>
+                                    <span className="star-icon">★</span> BASECAMP PERKS
+                                </div>
+                                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(20px, 2.8vw, 24px)', fontWeight: '800', margin: '0 0 6px', color: '#121613' }}>
+                                    Included Amenities & Basecamp Facilities
+                                </h2>
+                                {normalizedAmenities.length > 0 ? (
+                                    <>
+                                        <p style={{ fontSize: '13.5px', color: '#59655D', margin: '0 0 18px', lineHeight: 1.5 }}>
+                                            Every Aanandham stay amenities verified directly via property management system.
+                                        </p>
+                                        
+                                        <div className="basecamp-perks-container">
+                                            {normalizedAmenities.map((perk, aIdx) => (
+                                                <div
+                                                    key={aIdx}
+                                                    className="basecamp-perk-card"
+                                                >
+                                                    <div className="basecamp-perk-header">
+                                                        <span className="basecamp-perk-num">
+                                                            {perk.num || String(aIdx + 1).padStart(2, '0')}
+                                                        </span>
+                                                        <span className="basecamp-perk-tag">
+                                                            {perk.tag || 'Basecamp Perk'}
+                                                        </span>
+                                                    </div>
+                                                    <h3 className="basecamp-perk-title">
+                                                        {perk.title || perk.name}
+                                                    </h3>
+                                                    <p className="basecamp-perk-desc">
+                                                        {perk.desc}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="basecamp-perks-swipe-hint">
+                                            <span>← Swipe to explore amenities →</span>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div style={{ padding: '20px', background: '#F8F9F5', borderRadius: '14px', fontSize: '13px', color: '#7D8880', fontStyle: 'italic', border: '1px dashed rgba(18,22,19,0.1)' }}>
+                                        Amenities details unavailable (Not provided by PMS)
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* SECTION 4: 2-DAY DETAILED ITINERARY */}
+                            <div className="camp-section-card">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '8px' }}>
+                                    <div className="star-badge">
+                                        <span className="star-icon">★</span> EXPEDITION TIMELINE
+                                    </div>
+                                    {normalizedItinerary.length > 0 && (
+                                        <span style={{ fontSize: '11px', fontWeight: '800', color: '#166534', background: '#DCFCE7', padding: '3px 10px', borderRadius: '999px' }}>
+                                            {normalizedItinerary.length} Day Schedule
+                                        </span>
+                                    )}
+                                </div>
+                                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(20px, 2.8vw, 24px)', fontWeight: '800', margin: '0 0 14px', color: '#121613' }}>
+                                    Detailed Expedition Schedule
+                                </h2>
+
+                                {normalizedItinerary.length > 0 ? (
+                                    <>
+                                        {/* Mobile / Desktop Day Selector Tabs */}
+                                        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', background: '#F1F3EC', padding: '4px', borderRadius: '12px' }}>
+                                            {normalizedItinerary.map((dayPlan, didx) => {
+                                                const isDayActive = activeTimelineDay === didx;
+                                                return (
+                                                    <button
+                                                        key={didx}
+                                                        type="button"
+                                                        onClick={() => setActiveTimelineDay(didx)}
+                                                        style={{
+                                                            flex: 1,
+                                                            padding: '9px 12px',
+                                                            borderRadius: '9px',
+                                                            border: 'none',
+                                                            background: isDayActive ? '#121613' : 'transparent',
+                                                            color: isDayActive ? '#D5ED55' : '#59655D',
+                                                            fontSize: '12.5px',
+                                                            fontWeight: '800',
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.2s ease',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            gap: '6px'
+                                                        }}
+                                                    >
+                                                        <span>{dayPlan.day}</span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+
+                                        {/* Active Day Content - Compact Vertical Timeline */}
+                                        {(() => {
+                                            const currentDay = normalizedItinerary[activeTimelineDay] || normalizedItinerary[0];
+                                            if (!currentDay) return null;
+                                            return (
+                                                <div style={{ background: '#F8F9F5', borderRadius: '16px', padding: '16px 14px', border: '1px solid rgba(18,22,19,0.05)' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+                                                        <span style={{ background: '#121613', color: '#D5ED55', fontSize: '11px', fontWeight: '800', padding: '3px 9px', borderRadius: '6px' }}>
+                                                            {currentDay.day}
+                                                        </span>
+                                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '15.5px', fontWeight: '800', margin: 0, color: '#121613' }}>
+                                                            {currentDay.title}
+                                                        </h3>
+                                                    </div>
+
+                                                    {/* Milestone Items List */}
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                                        {(currentDay.items || []).map((item, itemIdx) => {
+                                                            const dashIndex = item.indexOf('–');
+                                                            const hasDash = dashIndex > -1;
+                                                            const timePart = hasDash ? item.slice(0, dashIndex).trim() : null;
+                                                            const descPart = hasDash ? item.slice(dashIndex + 1).trim() : item;
+
+                                                            return (
+                                                                <div key={itemIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                                                                    {timePart ? (
+                                                                        <span style={{
+                                                                            flexShrink: 0,
+                                                                            minWidth: '68px',
+                                                                            fontSize: '10.5px',
+                                                                            fontWeight: '800',
+                                                                            color: '#121613',
+                                                                            background: '#FFFFFF',
+                                                                            border: '1px solid rgba(18, 22, 19, 0.1)',
+                                                                            padding: '3px 6px',
+                                                                            borderRadius: '6px',
+                                                                            textAlign: 'center',
+                                                                            marginTop: '1px'
+                                                                        }}>
+                                                                            {timePart}
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#166534', flexShrink: 0, marginTop: '7px' }} />
+                                                                    )}
+                                                                    <div style={{ fontSize: '13px', color: '#2D3748', lineHeight: 1.45, fontWeight: '600' }}>
+                                                                        {descPart}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
+                                    </>
+                                ) : (
+                                    <div style={{ padding: '20px', background: '#F8F9F5', borderRadius: '14px', fontSize: '13px', color: '#7D8880', fontStyle: 'italic', border: '1px dashed rgba(18,22,19,0.1)' }}>
+                                        Detailed schedule unavailable (Not provided by PMS)
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* SECTION 5: INCLUSIONS & EXCLUSIONS */}
+                            <div className="camp-section-card">
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '24px' }}>
+                                    <div>
+                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '17px', fontWeight: '800', color: '#166534', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#DCFCE7', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>✓</span>
+                                            What's Included
+                                        </h3>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '9px' }}>
+                                            {safeInclusions.length > 0 ? (
+                                                safeInclusions.map((inc, iidx) => (
+                                                    <div key={iidx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '13px', color: '#3A443E', lineHeight: 1.45 }}>
+                                                        <span style={{ color: '#166534', fontWeight: '800', marginTop: '1px' }}>✓</span>
+                                                        <span>{inc}</span>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div style={{ fontSize: '13px', color: '#7D8880', fontStyle: 'italic' }}>
+                                                    Unavailable (Not specified by PMS)
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '17px', fontWeight: '800', color: '#DC2626', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#FEE2E2', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>✕</span>
+                                            What's Not Included
+                                        </h3>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '9px' }}>
+                                            {safeExclusions.length > 0 ? (
+                                                safeExclusions.map((exc, eidx) => (
+                                                    <div key={eidx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '13px', color: '#59655D', lineHeight: 1.45 }}>
+                                                        <span style={{ color: '#DC2626', fontWeight: '800', marginTop: '1px' }}>✕</span>
+                                                        <span>{exc}</span>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div style={{ fontSize: '13px', color: '#7D8880', fontStyle: 'italic' }}>
+                                                    Unavailable (Not specified by PMS)
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* SECTION: PROPERTY LOCATION & INTERACTIVE MAP */}
+                            <div className="camp-section-card" id="location-map">
+                                <div className="star-badge" style={{ marginBottom: '8px' }}>
+                                    <span className="star-icon">★</span> LOCATION & ACCESS
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+                                    <div>
+                                        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(20px, 2.8vw, 24px)', fontWeight: '800', margin: '0 0 6px', color: '#121613' }}>
+                                            Sanctuary Location & Access Map
+                                        </h2>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13.5px', color: '#59655D', flexWrap: 'wrap' }}>
+                                            <MapPin size={15} color="#166534" />
+                                            <span style={{ fontWeight: '700', color: '#121613' }}>
+                                                {camp.location ? `${camp.location}${camp.region ? `, ${camp.region}` : ''}` : (camp.region || 'Wilderness Sanctuary')}
+                                            </span>
+                                            {camp.altitude && (
+                                                <span style={{ background: '#F1F3EC', padding: '2px 8px', borderRadius: '6px', fontSize: '11.5px', fontWeight: '700', color: '#166534' }}>
+                                                    {camp.altitude}
+                                                </span>
+                                            )}
+                                            {hasCoords && (
+                                                <span style={{ fontSize: '11.5px', color: '#7D8880' }}>
+                                                    ({camp.latitude.toFixed(4)}° N, {camp.longitude.toFixed(4)}° E)
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Action Buttons: Get Directions & View on Google Maps */}
+                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                        <a
+                                            href={directionsUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="btn-lime"
+                                            style={{
+                                                padding: '9px 16px',
+                                                borderRadius: '10px',
+                                                fontSize: '12.5px',
+                                                fontWeight: '800',
+                                                textDecoration: 'none',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '6px',
+                                                boxShadow: '0 2px 8px rgba(213,237,85,0.3)'
+                                            }}
+                                        >
+                                            <Navigation size={14} />
+                                            <span>Get Directions</span>
+                                        </a>
+                                        <a
+                                            href={googleMapsSearchUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{
+                                                padding: '9px 14px',
+                                                borderRadius: '10px',
+                                                background: '#F1F3EC',
+                                                border: '1px solid rgba(18,22,19,0.12)',
+                                                color: '#121613',
+                                                fontSize: '12.5px',
+                                                fontWeight: '800',
+                                                textDecoration: 'none',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '6px'
+                                            }}
+                                        >
+                                            <ExternalLink size={13} />
+                                            <span>View in Google Maps</span>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                {/* Map View */}
+                                {hasMapEmbed ? (
+                                    <>
+                                    <div style={{
+                                        position: 'relative',
+                                        width: '100%',
+                                        height: '340px',
+                                        borderRadius: '18px',
+                                        overflow: 'hidden',
+                                        border: '1px solid rgba(18, 22, 19, 0.1)',
+                                        boxShadow: '0 4px 16px rgba(0,0,0,0.04)'
+                                    }}>
+                                        <iframe
+                                            title={`Map location for ${camp.title}`}
+                                            src={mapEmbedUrl}
+                                            width="100%"
+                                            height="100%"
+                                            style={{ border: 0 }}
+                                            allowFullScreen=""
+                                            loading="lazy"
+                                            referrerPolicy="no-referrer-when-downgrade"
+                                        />
+                                    </div>
+                                    
+                                    {/* Trail Arrival & Access Guide — driven by PMS arrivalInstructions */}
+                                    <div style={{ marginTop: '16px', background: '#F8F9F5', borderRadius: '16px', padding: '16px 18px', border: '1px solid rgba(18,22,19,0.06)' }}>
+                                        <div style={{ fontSize: '12.5px', fontWeight: '800', color: '#166534', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '8px' }}>
+                                            Navigation & Arrival Route
+                                        </div>
+                                        {Array.isArray(camp.arrivalInstructions) && camp.arrivalInstructions.length > 0 ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#3A443E', lineHeight: 1.5 }}>
+                                                {camp.arrivalInstructions.map((item, idx) => (
+                                                    <div key={item.step || idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                                                        <span style={{ fontWeight: '800', color: '#121613', flexShrink: 0 }}>{item.step || idx + 1}.</span>
+                                                        <span>
+                                                            {item.title && <strong>{item.title}: </strong>}
+                                                            {item.description}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div style={{ fontSize: '12.5px', color: '#7D8880', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <Navigation size={13} color="#9CA3AF" />
+                                                <span>Arrival route unavailable — Detailed directions shared upon booking confirmation.</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    </>
+                                ) : (
+                                    <div style={{
+                                        padding: '32px 20px',
+                                        borderRadius: '18px',
+                                        background: '#F8F9F5',
+                                        border: '1.5px dashed rgba(18, 22, 19, 0.15)',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        textAlign: 'center',
+                                        gap: '8px'
+                                    }}>
+                                        <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#EAECE4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <MapPinOff size={24} color="#7D8880" />
+                                        </div>
+                                        <div style={{ fontSize: '14.5px', fontWeight: '800', color: '#121613' }}>
+                                            Location Map Coordinates Not Available
+                                        </div>
+                                        <p style={{ fontSize: '12.5px', color: '#59655D', maxWidth: '480px', margin: 0, lineHeight: 1.5 }}>
+                                            Exact GPS coordinates and offline trail guide are being verified by property management. Full navigation instructions and host phone number are shared immediately upon booking confirmation.
+                                        </p>
+                                        <a
+                                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${camp.title} ${camp.location || camp.region || ''}`.trim())}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{
+                                                marginTop: '8px',
+                                                fontSize: '12px',
+                                                fontWeight: '800',
+                                                color: '#166534',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '5px',
+                                                textDecoration: 'underline'
+                                            }}
+                                        >
+                                            <ExternalLink size={12} />
+                                            <span>Search on Google Maps →</span>
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* SECTION 6: ROUTE & NAVIGATION GUIDE */}
+                            {camp.routeGuide && (
+                                <div className="camp-section-card">
+                                    <div className="star-badge" style={{ marginBottom: '8px' }}>
+                                        <span className="star-icon">★</span> ROUTE & NAVIGATION GUIDE
+                                    </div>
+                                    <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '24px', fontWeight: '800', margin: '0 0 6px', color: '#121613' }}>
+                                        Step-by-Step Directions & Route Guide
+                                    </h2>
+                                    <p style={{ fontSize: '13.5px', color: '#59655D', margin: '0 0 20px' }}>
+                                        Starting Point: <strong>{camp.routeGuide.from || 'Munnar Town'}</strong>
+                                    </p>
+
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+                                        {camp.routeGuide.steps && camp.routeGuide.steps.map((step, sidx) => (
+                                            <div key={sidx} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', background: '#F8F9F5', padding: '16px 18px', borderRadius: '16px', border: '1px solid rgba(18,22,19,0.05)' }}>
+                                                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#121613', color: '#D5ED55', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '800', flexShrink: 0, marginTop: '2px' }}>
+                                                    {sidx + 1}
+                                                </div>
+                                                <div style={{ fontSize: '14px', color: '#121613', lineHeight: 1.55, fontWeight: '600' }}>
+                                                    {step}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {camp.routeGuide.navigationWarning && (
+                                        <div style={{ background: '#FEF2F2', border: '1px solid rgba(239, 68, 68, 0.25)', borderRadius: '16px', padding: '16px 18px', marginBottom: '12px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                                            <TriangleAlert size={20} color="#DC2626" style={{ flexShrink: 0, marginTop: '2px' }} />
+                                            <div>
+                                                <div style={{ fontSize: '12.5px', fontWeight: '800', color: '#991B1B', textTransform: 'uppercase', marginBottom: '3px', letterSpacing: '0.4px' }}>Crucial Navigation Advisory</div>
+                                                <div style={{ fontSize: '13.5px', color: '#B91C1C', lineHeight: 1.5, fontWeight: '600' }}>
+                                                    {camp.routeGuide.navigationWarning}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {camp.routeGuide.roadCondition && (
+                                        <div style={{ background: '#F0FDF4', border: '1px solid rgba(22, 101, 52, 0.2)', borderRadius: '16px', padding: '16px 18px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                                            <CheckCircle2 size={20} color="#166534" style={{ flexShrink: 0, marginTop: '2px' }} />
+                                            <div>
+                                                <div style={{ fontSize: '12.5px', fontWeight: '800', color: '#166534', textTransform: 'uppercase', marginBottom: '3px', letterSpacing: '0.4px' }}>Road Clearance & Vehicle Types</div>
+                                                <div style={{ fontSize: '13.5px', color: '#14532D', lineHeight: 1.5, fontWeight: '600' }}>
+                                                    {camp.routeGuide.roadCondition}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                        </div>
+
+                        {/* ── RIGHT COLUMN: SLEEK EXPANDED STICKY AVAILABILITY & BOOKING CARD ── */}
+                        <div style={{ position: 'sticky', top: '90px' }}>
+                            <div className="camp-booking-sidebar">
+                                
+                                {/* Header / Per-Camper Pricing Display */}
+                                <div style={{ borderBottom: '1px solid rgba(18, 22, 19, 0.08)', paddingBottom: '16px', marginBottom: '18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                                    <div>
+                                        <div style={{ fontSize: '11px', color: '#7D8880', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.6px' }}>Starts at</div>
+                                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                                            <span style={{ fontFamily: 'var(--font-heading)', fontSize: '28px', fontWeight: '900', color: '#121613' }}>
+                                                ₹{roomPrice.toLocaleString('en-IN')}
+                                            </span>
+                                            <span style={{ fontSize: '13px', color: '#59655D', fontWeight: '600' }}>
+                                                {currentRoomIsDorm ? '/ bed / night' : (isPerRoomPricing ? '/ room / night' : (typeMeta.pricingSuffix || '/ night'))}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    {camp.archived ? (
+                                        <span style={{ background: 'rgba(239, 68, 68, 0.12)', color: '#DC2626', fontSize: '11px', fontWeight: '800', padding: '5px 11px', borderRadius: '999px', display: 'inline-flex', alignItems: 'center', gap: '5px', border: '1px solid rgba(239,68,68,0.2)' }}>
+                                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#EF4444' }} />
+                                            <span>Archived · Bookings Closed</span>
+                                        </span>
+                                    ) : (
+                                        <span style={{ background: '#DCFCE7', color: '#166534', fontSize: '11px', fontWeight: '800', padding: '5px 11px', borderRadius: '999px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22C55E' }} />
+                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}><Zap size={11} /> Live Available</span>
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* Form Inputs */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                    
+                                    {/* 1. Date Batch Selector */}
+                                    <div>
+                                        <label style={{ fontSize: '11.5px', fontWeight: '800', color: '#59655D', textTransform: 'uppercase', display: 'block', marginBottom: '5px', letterSpacing: '0.5px' }}>
+                                            1. Check-In Weekend Batch
+                                        </label>
+                                        <CustomDateBatchPicker
+                                            value={selectedDate}
+                                            onChange={setSelectedDate}
+                                            label="Select Batch Date"
+                                            propertyId={camp?.id}
+                                            campsiteId={camp?.id}
+                                            checkInTime={camp?.checkInTime}
+                                            checkOutTime={camp?.checkOutTime}
+                                        />
+                                    </div>
+
+                                    {/* 2. Room Type Selector */}
+                                    <div>
+                                        <label style={{ fontSize: '11.5px', fontWeight: '800', color: '#59655D', textTransform: 'uppercase', display: 'block', marginBottom: '5px', letterSpacing: '0.5px' }}>
+                                            2. Accommodation Style
+                                        </label>
+                                        <CustomSelectDropdown
+                                            value={selectedRoomId}
+                                            onChange={(val) => { setSelectedRoomId(val); setCustomUnits(null); }}
+                                            options={availableRooms.map(r => {
+                                                const dorm = isDormRoom(r);
+                                                const capLabel = dorm
+                                                    ? (r.capacity ? (r.capacity.toLowerCase().includes('bed') ? r.capacity : `${r.capacity} Beds`) : 'Dorm')
+                                                    : (r.capacity || 'Unit');
+                                                const live = liveInventory?.[r.id];
+                                                const availTag = live ? (live.availableUnits === 0 ? ' · [SOLD OUT]' : ` · ${live.availableUnits} ${dorm ? 'Beds' : 'Units'} Left`) : '';
+                                                return {
+                                                    value: r.id,
+                                                    label: `${r.name} (${capLabel}) — ₹${(live?.price || r.price || r.pricePerPerson || camp.price || 2499).toLocaleString('en-IN')}${availTag}`
+                                                };
+                                            })}
+                                        />
+                                    </div>
+
+                                    {/* 3. Campers / Guests Counter */}
+                                    <div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                                                <label style={{ fontSize: '11.5px', fontWeight: '800', color: '#59655D', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                                    {currentRoomIsDorm ? '3. Total Dorm Beds' : (typeMeta.id === 'campsite' ? '3. Total Campers' : '3. Total Guests')}
+                                                </label>
+                                                <span style={{
+                                                    fontSize: '10px',
+                                                    fontWeight: '800',
+                                                    padding: '2px 7px',
+                                                    borderRadius: '6px',
+                                                    background: guestsCount >= maxAllowedCapacity ? '#FEF2F2' : '#F0FDF4',
+                                                    color: guestsCount >= maxAllowedCapacity ? '#DC2626' : '#166534',
+                                                    border: `1px solid ${guestsCount >= maxAllowedCapacity ? '#FECACA' : '#BBF7D0'}`
+                                                }}>
+                                                    {currentRoomIsDorm ? `${maxAllowedCapacity} Beds Remaining` : `${currentRoom?.totalUnits || maxAllowedCapacity} Units Remaining`}
+                                                </span>
+                                            </div>
+                                            <span style={{ fontSize: '11.5px', color: '#166534', fontWeight: '800' }}>
+                                                {discountLabel ? (
+                                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Sparkles size={11} /> {discountLabel}</span>
+                                                ) : (
+                                                    currentRoomIsDorm
+                                                        ? `${guestsCount} ${guestsCount === 1 ? 'Dorm Bed' : 'Dorm Beds'}`
+                                                        : `${effectiveUnits} ${effectiveUnits === 1 ? typeMeta.unitTerm : typeMeta.unitsPlural}`
+                                                )}
+                                            </span>
+                                        </div>
+
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            background: '#F8F9F5',
+                                            borderRadius: '14px',
+                                            border: guestsCount >= maxAllowedCapacity ? '1.5px solid #FCA5A5' : '1px solid rgba(18, 22, 19, 0.1)',
+                                            padding: '5px 8px',
+                                            transition: 'border-color 0.2s ease'
+                                        }}>
+                                            <button
+                                                type="button"
+                                                onClick={handleDecrementGuests}
+                                                disabled={guestsCount <= 1}
+                                                style={{
+                                                    width: '36px',
+                                                    height: '36px',
+                                                    borderRadius: '10px',
+                                                    background: '#FFFFFF',
+                                                    border: '1px solid rgba(18,22,19,0.1)',
+                                                    color: guestsCount <= 1 ? '#9CA3AF' : '#121613',
+                                                    fontSize: '18px',
+                                                    fontWeight: '800',
+                                                    cursor: guestsCount <= 1 ? 'not-allowed' : 'pointer',
+                                                    opacity: guestsCount <= 1 ? 0.4 : 1,
+                                                    transition: 'all 0.15s ease'
+                                                }}
+                                                aria-label="Decrease count"
+                                            >
+                                                −
+                                            </button>
+                                            <div style={{ flex: 1, textAlign: 'center', fontFamily: 'var(--font-heading)', fontSize: '16px', fontWeight: '800' }}>
+                                                {guestsCount} {currentRoomIsDorm ? (guestsCount === 1 ? 'Bed' : 'Beds') : (guestsCount === 1 ? (typeMeta.id === 'campsite' ? 'Camper' : 'Guest') : (typeMeta.id === 'campsite' ? 'Campers' : 'Guests'))}
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={handleIncrementGuests}
+                                                disabled={guestsCount >= maxAllowedCapacity}
+                                                style={{
+                                                    width: '36px',
+                                                    height: '36px',
+                                                    borderRadius: '10px',
+                                                    background: guestsCount >= maxAllowedCapacity ? '#F3F4F6' : '#FFFFFF',
+                                                    border: '1px solid rgba(18,22,19,0.1)',
+                                                    color: guestsCount >= maxAllowedCapacity ? '#9CA3AF' : '#121613',
+                                                    fontSize: '18px',
+                                                    fontWeight: '800',
+                                                    cursor: guestsCount >= maxAllowedCapacity ? 'not-allowed' : 'pointer',
+                                                    opacity: guestsCount >= maxAllowedCapacity ? 0.45 : 1,
+                                                    transition: 'all 0.15s ease'
+                                                }}
+                                                title={guestsCount >= maxAllowedCapacity ? `Maximum remaining reached (${maxAllowedCapacity} beds max)` : 'Add more'}
+                                                aria-label="Increase count"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+
+                                        {/* Dynamic Capacity Notification & Alert */}
+                                        {(guestsCount >= maxAllowedCapacity || capacityWarning) && (
+                                            <div style={{
+                                                marginTop: '8px',
+                                                padding: '9px 12px',
+                                                borderRadius: '11px',
+                                                background: '#FEF2F2',
+                                                border: '1px solid #FCA5A5',
+                                                color: '#991B1B',
+                                                fontSize: '11.5px',
+                                                fontWeight: '700',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '8px',
+                                                lineHeight: 1.35
+                                            }}>
+                                                <TriangleAlert size={14} color="#DC2626" style={{ flexShrink: 0 }} />
+                                                <span>
+                                                    <strong>{currentRoomIsDorm ? 'Remaining Beds Reached:' : 'Remaining Units Reached:'}</strong> All <strong>{maxAllowedCapacity} {currentRoomIsDorm ? (maxAllowedCapacity === 1 ? 'bed' : 'beds') : 'units'}</strong> for {currentRoom?.name || 'this room'} have been selected. Further selections are capped.
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Price & Summary Box */}
+                                    <div style={{ background: '#F4F7EB', borderRadius: '16px', padding: '14px 18px', border: '1px solid rgba(22, 101, 52, 0.15)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '3px' }}>
+                                            <span style={{ fontSize: '13px', fontWeight: '700', color: '#59655D' }}>Estimated Total:</span>
+                                            <span style={{ fontFamily: 'var(--font-heading)', fontSize: '22px', fontWeight: '900', color: '#166534' }}>
+                                                {discountAmount > 0 && (
+                                                    <span style={{ textDecoration: 'line-through', fontSize: '14px', fontWeight: '700', color: '#8A938B', marginRight: '8px' }}>
+                                                        ₹{((isPerRoomPricing ? effectiveUnits * roomPrice : guestsCount * roomPrice) * stayNights).toLocaleString('en-IN')}
+                                                    </span>
+                                                )}
+                                                ₹{estimatedTotal.toLocaleString('en-IN')}
+                                            </span>
+                                        </div>
+                                        {discountAmount > 0 && (
+                                            <div style={{ fontSize: '11px', color: '#166534', fontWeight: '700', marginBottom: '3px' }}>
+                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Sparkles size={11} /> {discountLabel} · You save ₹{discountAmount.toLocaleString('en-IN')}</span>
+                                            </div>
+                                        )}
+                                        <div style={{ fontSize: '11px', color: '#166534', fontWeight: '600' }}>
+                                            ✓ Includes {currentRoomIsDorm ? `${guestsCount} × ${currentRoom.name} Bed${guestsCount > 1 ? 's' : ''}` : `${effectiveUnits} × ${currentRoom.name}`} for {stayNights} Night{stayNights > 1 ? 's' : ''}{safeInclusions.length > 0 ? ` · ${safeInclusions[0]}` : ''}
+                                        </div>
+                                    </div>
+
+                                    {/* Primary Booking Button */}
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        {camp.archived ? (
+                                            <button
+                                                type="button"
+                                                disabled
+                                                style={{
+                                                    flex: '1.45',
+                                                    minWidth: 0,
+                                                    padding: '13px 12px',
+                                                    fontSize: '13.5px',
+                                                    fontWeight: '800',
+                                                    borderRadius: '14px',
+                                                    background: 'rgba(18, 22, 19, 0.08)',
+                                                    color: '#7D8880',
+                                                    cursor: 'not-allowed',
+                                                    border: '1px solid rgba(18, 22, 19, 0.12)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '6px'
+                                                }}
+                                            >
+                                                <span>Archived — Bookings Closed</span>
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => setIsBookingModalOpen(true)}
+                                                className="btn-lime"
+                                                style={{
+                                                    flex: '1.45',
+                                                    minWidth: 0,
+                                                    padding: '13px 12px',
+                                                    fontSize: '13.5px',
+                                                    fontWeight: '900',
+                                                    borderRadius: '14px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '6px',
+                                                    boxShadow: '0 4px 16px rgba(213,237,85,0.35)'
+                                                }}
+                                            >
+                                                <span>Book Now</span>
+                                                <span style={{ whiteSpace: 'nowrap' }}>→</span>
+                                            </button>
+                                        )}
+
+                                        <a
+                                            href={waLink(`Hi Aanandham Team! I want to check availability for ${camp.title} on ${selectedDate} for ${guestsCount} ${currentRoomIsDorm ? 'dorm bed(s)' : 'campers'} in ${currentRoom.name}. Estimated total: ₹${estimatedTotal.toLocaleString('en-IN')}.`)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={() => logWhatsAppInquiry({
+                                                text: `Check availability for ${camp.title} on ${selectedDate} for ${guestsCount} campers in ${currentRoom.name}`,
+                                                source: `Camp Detail: ${camp.title}`,
+                                                campsiteId: camp.id,
+                                                guests: guestsCount,
+                                                travelDates: selectedDate
+                                            })}
+                                            style={{
+                                                flex: '1',
+                                                minWidth: 0,
+                                                padding: '11.5px 10px',
+                                                borderRadius: '14px',
+                                                background: '#F1F3EC',
+                                                border: '1px solid rgba(18,22,19,0.08)',
+                                                color: '#121613',
+                                                fontSize: '13px',
+                                                fontWeight: '800',
+                                                textDecoration: 'none',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '7px',
+                                                boxSizing: 'border-box'
+                                            }}
+                                        >
+                                            <WhatsAppIcon size={16} color="#25D366" />
+                                            <span className="cta-label-wide">WhatsApp Desk</span><span className="cta-label-narrow">WhatsApp</span>
+                                        </a>
+                                    </div>
+
+                                    <div style={{ textAlign: 'center', fontSize: '11.5px', color: '#166534', fontWeight: '700', marginTop: '4px' }}>
+                                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
+                                            <Lock size={11} /> No Login Required · Instant Confirmation · Transparent Pricing
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            {/* ── CARD 2: QUICK EXPEDITION TIMINGS ── */}
+                            <div style={{
+                                background: '#FFFFFF',
+                                borderRadius: '20px',
+                                padding: '18px 20px',
+                                marginTop: '16px',
+                                border: '1px solid rgba(18, 22, 19, 0.08)',
+                                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                                    <Clock size={15} color="#166534" />
+                                    <span style={{ fontSize: '12px', fontWeight: '800', color: '#121613', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                        Stay & Check-in Schedule
+                                    </span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                    <div style={ROW_SPACE_12}>
+                                        <span style={{ color: '#59655D' }}>Check-in:</span>
+                                        <span style={{ fontWeight: '800', color: '#121613' }}>{camp?.checkInTime ? (camp.checkInTime.includes(':') ? `${camp.checkInTime} hrs` : camp.checkInTime) : 'Unavailable'}</span>
+                                    </div>
+                                    <div style={ROW_SPACE_12}>
+                                        <span style={{ color: '#59655D' }}>Check-out:</span>
+                                        <span style={{ fontWeight: '800', color: '#121613' }}>{camp?.checkOutTime ? (camp.checkOutTime.includes(':') ? `${camp.checkOutTime} hrs` : camp.checkOutTime) : 'Unavailable'}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* ── CARD 2B: CANCELLATION POLICY FROM PMS ── */}
+                            {camp?.cancellationPolicy && typeof camp.cancellationPolicy === 'string' && (
+                                <div style={{
+                                    background: '#FFFFFF',
+                                    borderRadius: '20px',
+                                    padding: '18px 20px',
+                                    marginTop: '16px',
+                                    border: '1px solid rgba(18, 22, 19, 0.08)',
+                                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                                        <ShieldCheck size={15} color="#166534" />
+                                        <span style={{ fontSize: '12px', fontWeight: '800', color: '#121613', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                            Cancellation Policy
+                                        </span>
+                                    </div>
+                                    <p style={{ fontSize: '12px', color: '#59655D', lineHeight: 1.6, margin: 0 }}>
+                                        {camp.cancellationPolicy}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* ── CARD 3: AANANDHAM WILDERNESS SAFETY PROMISE ── */}
+                            <div style={{
+                                background: 'linear-gradient(135deg, #101E13 0%, #172B1C 100%)',
+                                borderRadius: '20px',
+                                padding: '18px 20px',
+                                marginTop: '16px',
+                                color: '#FFFFFF',
+                                border: '1px solid rgba(213, 237, 85, 0.2)'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                                    <ShieldCheck size={16} color="#D5ED55" />
+                                    <span style={{ fontSize: '12px', fontWeight: '800', color: '#D5ED55', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                        Wilderness Guarantee
+                                    </span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: '#E2E8F0' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span style={{ color: '#D5ED55', fontWeight: '900' }}>✓</span>
+                                        <span>24/7 Gated Perimeter & Certified Guides</span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span style={{ color: '#D5ED55', fontWeight: '900' }}>✓</span>
+                                        <span>Western Washrooms with Hot Water</span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span style={{ color: '#D5ED55', fontWeight: '900' }}>✓</span>
+                                        <span>Free Date Reschedule in Heavy Rain</span>
+                                    </div>
+                                </div>
+
+                                <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)', marginTop: '14px', paddingTop: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div style={{ fontSize: '11px', color: '#A2B6A6' }}>Have Squad Questions?</div>
+                                    {(() => {
+                                        const enquiryPhone = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP || '919074858014';
+                                        const estPrice = (currentRoom?.price || camp.price || 2499) * guestsCount;
+                                        const squadInquiryMsg = `*Aanandham Wilderness — Campsite Inquiry*
+
+- *Campsite:* ${camp.title} (${camp.location || camp.region || 'Unavailable'})
+- *Lodging:* ${currentRoom?.name || 'Standard Tent'}
+- *Travel Dates:* ${selectedDate}
+- *Campers:* ${guestsCount} guest(s)
+- *Est. Rate:* ₹${estPrice.toLocaleString('en-IN')}
+
+Hi Aanandham! I have questions regarding availability and squad booking for this stay.`;
+
+                                        return (
+                                            <a
+                                                href={waLink(squadInquiryMsg, enquiryPhone)}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                onClick={() => logWhatsAppInquiry({
+                                                    text: squadInquiryMsg,
+                                                    phone: enquiryPhone,
+                                                    source: `Camp Squad Questions: ${camp.title}`,
+                                                    campsiteId: camp.id,
+                                                    guests: guestsCount,
+                                                    travelDates: selectedDate
+                                                })}
+                                                style={{ fontSize: '12px', color: '#D5ED55', fontWeight: '800', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                                            >
+                                                <WhatsAppIcon size={14} color="#25D366" />
+                                                <span>Chat →</span>
+                                            </a>
+                                        );
+                                    })()}
+                                </div>
+                            </div>
+
+                            {/* ── CARD 4: TRANSPARENT CANCELLATION & REFUND POLICY ── */}
+                            <div style={{
+                                background: '#FFFFFF',
+                                borderRadius: '20px',
+                                padding: '18px 20px',
+                                marginTop: '16px',
+                                border: '1px solid rgba(18, 22, 19, 0.08)',
+                                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                                    <ShieldCheck size={16} color="#166534" />
+                                    <span style={{ fontSize: '12px', fontWeight: '800', color: '#121613', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                        Cancellation & Refund Policy
+                                    </span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                    {CANCELLATION_TIERS.map(tier => (
+                                        <div key={tier.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', fontSize: '11.5px', borderBottom: '1px solid rgba(18,22,19,0.05)', paddingBottom: '6px', flexWrap: 'wrap', columnGap: '8px' }}>
+                                            <div>
+                                                <div style={{ fontWeight: '800', color: '#121613' }}>{tier.title}</div>
+                                                <div style={{ color: '#59655D', fontSize: '10.5px' }}>{tier.description}</div>
+                                            </div>
+                                            <span style={{ fontWeight: '900', color: tier.refundPercentage === 100 ? '#166534' : tier.refundPercentage > 0 ? '#B45309' : '#6B7280', whiteSpace: 'nowrap', marginLeft: '8px' }}>
+                                                {tier.refundPercentage}%
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </section>
+
+                {/* ── NEARBY OTHER CAMPSITES SECTION ── */}
+                {nearbyCamps.length > 0 && (
+                    <section style={{ maxWidth: '1440px', margin: '100px auto 0', padding: '0 clamp(20px, 4vw, 48px)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '14px' }}>
+                            <div>
+                                <div className="star-badge" style={{ marginBottom: '6px' }}>
+                                    <span className="star-icon">★</span> SIMILAR RETREATS
+                                </div>
+                                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(24px, 3.5vw, 32px)', fontWeight: '800', margin: 0, color: '#121613' }}>
+                                    Explore Other {camp?.region || typeMeta.label || 'Wilderness'} Stays
+                                </h2>
+                            </div>
+                            <Link href="/camps" style={{ color: '#166534', fontWeight: '800', fontSize: '13.5px', textDecoration: 'underline' }}>
+                                View All Stays →
+                            </Link>
+                        </div>
+
+                        <div className="similar-camps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: '24px' }}>
+                            {nearbyCamps.map((nc) => {
+                                const ncTypeMeta = resolvePropertyType(nc.propertyTypeSlug || nc.propertyType?.slug || nc.category, nc.title);
+                                const ncPricingUnit = getPricingUnitLabel(nc);
+
+                                return (
+                                <Link
+                                    key={nc.id}
+                                    href={`/camps/${nc.id}`}
+                                    className="similar-camp-card hover-lift card-img-zoom"
+                                    style={{
+                                        background: '#FFFFFF',
+                                        borderRadius: '22px',
+                                        overflow: 'hidden',
+                                        border: '1px solid rgba(18,22,19,0.08)',
+                                        textDecoration: 'none',
+                                        color: 'inherit',
+                                        display: 'flex',
+                                        flexDirection: 'column'
+                                    }}
+                                >
+                                    <div className="similar-camp-card-media" style={{ height: '200px', position: 'relative' }}>
+                                        <img
+                                            src={nc.image}
+                                            alt={nc.title}
+                                            width="400"
+                                            height="200"
+                                            loading="lazy"
+                                            decoding="async"
+                                            style={IMG_FILL}
+                                        />
+                                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 40%, rgba(0,0,0,0.5) 100%)', pointerEvents: 'none' }} />
+                                        <div style={{ position: 'absolute', top: '12px', left: '12px', right: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', pointerEvents: 'none', zIndex: 3 }}>
+                                            <span style={{ background: '#E5A93B', color: '#121613', fontSize: '11px', fontWeight: '800', padding: '4px 10px', borderRadius: '999px' }}>
+                                                {nc.altitude}
+                                            </span>
+                                            <span style={{ fontSize: '11px', fontWeight: '800', background: 'rgba(255,255,255,0.95)', color: '#121613', padding: '3px 8px', borderRadius: '999px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                                ★ {nc.rating || 4.9}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="similar-camp-card-body" style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                                            <span style={{ fontSize: '11px', fontWeight: '800', color: '#166534', textTransform: 'uppercase' }}>
+                                                {ncTypeMeta.badge || nc.region}
+                                            </span>
+                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10.5px', fontWeight: '800', color: '#166534', background: '#DCFCE7', padding: '2px 8px', borderRadius: '999px' }}>
+                                                <span className="live-available-dot" style={{ width: '6px', height: '6px' }} />
+                                                Live Available
+                                            </span>
+                                        </div>
+                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '17px', fontWeight: '800', margin: '0 0 10px', color: '#121613' }}>
+                                            {nc.title}
+                                        </h3>
+                                        <div style={{ borderTop: '1px solid rgba(18,22,19,0.06)', paddingTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+                                            <div>
+                                                <span style={{ fontSize: '10px', color: '#7D8880', display: 'block', fontWeight: '700', textTransform: 'uppercase' }}>Starts at</span>
+                                                <span style={{ fontFamily: 'var(--font-heading)', fontSize: '16px', fontWeight: '900', color: '#121613' }}>₹{nc.price?.toLocaleString('en-IN') || nc.price}</span>
+                                                <span style={{ fontSize: '11px', color: '#59655D', fontWeight: '600' }}> {ncPricingUnit}</span>
+                                            </div>
+                                            <span style={{ color: '#166534', fontWeight: '800', fontSize: '12.5px' }}>View Stay →</span>
+                                        </div>
+                                    </div>
+                                </Link>
+                                );
+                            })}
+                        </div>
+                    </section>
+                )}
+
+            </main>
+
+            {/* ── FOOTER ── */}
+            <Footer />
+
+            {/* ── BOOKING MODAL WITH PRE-FILLED CAMPSITE, ROOM, GUESTS & DATE ── */}
+            <BookingEngineModal
+                isOpen={isBookingModalOpen}
+                onClose={() => setIsBookingModalOpen(false)}
+                initialPackage={camp}
+                initialRoom={currentRoom}
+                initialRoomId={selectedRoomId}
+                initialDate={selectedDate}
+                initialGuests={guestsCount}
+                initialAdults={guestsCount}
+                initialCustomUnits={customUnits}
+            />
+
+            {/* ── FULLSCREEN PHOTO LIGHTBOX ── */}
+            <AnimatePresence>
+                {isLightboxOpen && (
+                    <div
+                        onClick={() => setIsLightboxOpen(false)}
+                        style={{
+                            position: 'fixed',
+                            inset: 0,
+                            zIndex: 100000,
+                            background: 'rgba(0, 0, 0, 0.95)',
+                            backdropFilter: 'blur(16px)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '24px'
+                        }}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            onClick={e => e.stopPropagation()}
+                            style={{ position: 'relative', maxWidth: '1000px', width: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                        >
+                            {/* Lightbox Header with Title & Subtitle */}
+                            <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', color: '#FFFFFF' }}>
+                                <div>
+                                    <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '800', color: '#D5ED55' }}>
+                                        {lightboxTitle || camp.title}
+                                    </h4>
+                                    {lightboxSub && (
+                                        <div style={{ fontSize: '12px', color: '#A2B6A6', marginTop: '2px' }}>
+                                            {lightboxSub}
+                                        </div>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => setIsLightboxOpen(false)}
+                                    style={{
+                                        background: 'rgba(255,255,255,0.15)',
+                                        border: 'none',
+                                        color: '#FFFFFF',
+                                        width: '36px',
+                                        height: '36px',
+                                        borderRadius: '50%',
+                                        fontSize: '18px',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontWeight: '800'
+                                    }}
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            <img
+                                src={(lightboxPhotos.length > 0 ? lightboxPhotos[activePhotoIdx] : gallery[activePhotoIdx]) || ''}
+                                alt={lightboxTitle || camp.title}
+                                style={{ width: '100%', height: 'auto', maxHeight: '65vh', objectFit: 'contain', display: 'block', margin: '0 auto', borderRadius: '16px' }}
+                                loading="lazy" decoding="async"
+                            />
+                            
+                            {/* Controls */}
+                            {((lightboxPhotos.length > 0 ? lightboxPhotos.length : gallery.length) > 1) && (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: '14px', color: '#FFFFFF' }}>
+                                    <button
+                                        onClick={() => {
+                                            const total = lightboxPhotos.length > 0 ? lightboxPhotos.length : gallery.length;
+                                            setActivePhotoIdx((activePhotoIdx - 1 + total) % total);
+                                        }}
+                                        style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: '#FFFFFF', padding: '8px 18px', borderRadius: '999px', cursor: 'pointer', fontWeight: '800', fontSize: '13px' }}
+                                    >
+                                        ← Previous
+                                    </button>
+                                    <span style={{ fontSize: '13px', fontWeight: '700', color: '#D5ED55' }}>
+                                        {activePhotoIdx + 1} / {lightboxPhotos.length > 0 ? lightboxPhotos.length : gallery.length}
+                                    </span>
+                                    <button
+                                        onClick={() => {
+                                            const total = lightboxPhotos.length > 0 ? lightboxPhotos.length : gallery.length;
+                                            setActivePhotoIdx((activePhotoIdx + 1) % total);
+                                        }}
+                                        style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: '#FFFFFF', padding: '8px 18px', borderRadius: '999px', cursor: 'pointer', fontWeight: '800', fontSize: '13px' }}
+                                    >
+                                        Next →
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Bottom Thumbnail Strip */}
+                            {((lightboxPhotos.length > 0 ? lightboxPhotos : gallery).length > 1) && (
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '14px', overflowX: 'auto', maxWidth: '100%', padding: '4px' }}>
+                                    {(lightboxPhotos.length > 0 ? lightboxPhotos : gallery).map((photoUrl, pIdx) => (
+                                        <div
+                                            key={pIdx}
+                                            onClick={() => setActivePhotoIdx(pIdx)}
+                                            style={{
+                                                width: '54px',
+                                                height: '40px',
+                                                borderRadius: '8px',
+                                                overflow: 'hidden',
+                                                border: activePhotoIdx === pIdx ? '2px solid #D5ED55' : '1px solid rgba(255,255,255,0.3)',
+                                                cursor: 'pointer',
+                                                opacity: activePhotoIdx === pIdx ? 1 : 0.6,
+                                                flexShrink: 0,
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                        >
+                                            <img src={photoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ── TOAST NOTIFICATION ── */}
+            <AnimatePresence>
+                {shareToast && (
+                    <div style={{
+                        position: 'fixed',
+                        top: '24px',
+                        left: 0,
+                        right: 0,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        pointerEvents: 'none',
+                        zIndex: 100000,
+                        padding: '0 16px'
+                    }}>
+                        <motion.div
+                            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -15, scale: 0.95 }}
+                            style={{
+                                pointerEvents: 'auto',
+                                background: '#121613',
+                                color: '#FFFFFF',
+                                padding: '12px 24px',
+                                borderRadius: '999px',
+                                fontSize: '13.5px',
+                                fontWeight: '700',
+                                border: '1.5px solid #D5ED55',
+                                boxShadow: '0 16px 40px rgba(0,0,0,0.7), 0 0 24px rgba(213, 237, 85, 0.25)',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}
+                        >
+                            <span>{shareToast}</span>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+        </div>
+    );
+}

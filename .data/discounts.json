@@ -1,0 +1,22 @@
+[
+  {
+    "id": "squad-10",
+    "name": "Squad Off (4+ Guests)",
+    "type": "percent",
+    "value": 10,
+    "minGuests": 4,
+    "scope": "all",
+    "active": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "squad-15",
+    "name": "Squad Off (8+ Guests)",
+    "type": "percent",
+    "value": 15,
+    "minGuests": 8,
+    "scope": "all",
+    "active": true,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  }
+]

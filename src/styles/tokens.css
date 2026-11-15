@@ -1,0 +1,62 @@
+:root {
+  /* ── Color Palette: Highland Sanctuary & Pine Forest ── */
+  --color-bg-primary: #F8F9F5;
+  --color-bg-secondary: #FFFFFF;
+  --color-bg-subtle: #F0F2EC;
+  --color-bg-dark: #121613;
+  --color-bg-dark-card: #181E1A;
+  --color-bg-dark-elevated: #222A24;
+  
+  --color-text-primary: #121613;
+  --color-text-secondary: #4A554D;
+  --color-text-muted: #6B776E;
+  --color-text-light: #FFFFFF;
+  --color-text-light-muted: #A3B1A7;
+  
+  --color-brand-pine: #1B4D3E;
+  --color-brand-pine-hover: #143A2F;
+  --color-brand-pine-light: #E8F0EC;
+  --color-brand-amber: #D97706;
+  --color-brand-amber-light: #FEF3C7;
+  --color-brand-terracotta: #C2410C;
+  --color-accent-gold: #CA8A04;
+  
+  --color-border-subtle: rgba(18, 22, 19, 0.08);
+  --color-border-medium: rgba(18, 22, 19, 0.16);
+  --color-border-dark-subtle: rgba(255, 255, 255, 0.08);
+  --color-border-dark-medium: rgba(255, 255, 255, 0.16);
+
+  /* ── Typography Tokens ── */
+  --font-family-display: var(--font-bricolage, 'Bricolage Grotesque', sans-serif);
+  --font-family-sans: var(--font-jakarta, 'Plus Jakarta Sans', sans-serif);
+  
+  /* ── Spacing Tokens ── */
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
+  --space-section: clamp(64px, 8vw, 112px);
+
+  /* ── Border Radius ── */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ── Elevation & Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(18, 22, 19, 0.06);
+  --shadow-md: 0 4px 14px rgba(18, 22, 19, 0.08);
+  --shadow-lg: 0 12px 32px rgba(18, 22, 19, 0.12);
+  --shadow-dark: 0 12px 32px rgba(0, 0, 0, 0.35);
+
+  /* ── Transitions ── */
+  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}

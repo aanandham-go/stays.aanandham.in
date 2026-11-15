@@ -1,0 +1,178 @@
+import React from 'react';
+import CampsDirectoryClient from '../CampsDirectoryClient';
+import { INITIAL_ALL_CAMPS, DEPRECATED_CAMP_IDS } from '@/lib/campsData';
+
+export const metadata = {
+  title: 'Boutique Stays & Domes in Munnar | Aanandham Stays',
+  description:
+    'Discover verified mountain stays and ridge glamping across Suryanelli & Kolukkumalai. 4x4 sunrise safari, campfire BBQ & luxury dome pods from ₹1,899.',
+  alternates: {
+    canonical: 'https://stays.aanandham.in/camps/munnar',
+  },
+  openGraph: {
+    title: 'Boutique Stays & Domes in Munnar | Aanandham Stays',
+    description:
+      'Discover verified mountain stays and ridge glamping across Suryanelli & Kolukkumalai. 4x4 sunrise safari, campfire BBQ & luxury dome pods from ₹1,899.',
+    url: 'https://stays.aanandham.in/camps/munnar',
+    siteName: 'Aanandham Stays',
+    images: [
+      {
+        url: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1200&h=630&q=80',
+        width: 1200,
+        height: 630,
+        alt: 'Boutique Stays & Domes in Munnar - Aanandham Stays',
+      },
+    ],
+    locale: 'en_IN',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Boutique Stays & Domes in Munnar | Aanandham Stays',
+    description: 'Explore verified high-altitude geodesic domes and ridge stays across Munnar & Suryanelli.',
+    images: ['https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1200&h=630&q=80'],
+  },
+};
+
+export default function MunnarCampsPage() {
+  const munnarCamps = INITIAL_ALL_CAMPS.filter(c => (c.region === 'Munnar' || c.region === 'Suryanelli') && !c.archived && !DEPRECATED_CAMP_IDS.has(c.id));
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://stays.aanandham.in';
+
+  // 1. Google Structured Data: Breadcrumbs
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Camps',
+        item: `${siteUrl}/camps`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Top Camps in Munnar',
+        item: `${siteUrl}/camps/munnar`,
+      },
+    ],
+  };
+
+  // 2. Google Structured Data: Top Camps ItemList for Carousel / Rich Snippet Ranking
+  const itemListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Top Camps in Munnar & Best Camp Stays',
+    description: 'Ranked list of verified high-altitude campsites and luxury glamping stays in Munnar.',
+    itemListElement: munnarCamps.map((camp, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      item: {
+        '@type': 'LodgingBusiness',
+        name: camp.title || camp.name,
+        description: camp.description || 'Verified campsite in Munnar with 4x4 safari, campfire BBQ and mountain vistas.',
+        url: `${siteUrl}/camps/${camp.id}`,
+        image: camp.image ? (camp.image.startsWith('http') ? camp.image : `${siteUrl}${camp.image}`) : undefined,
+        priceRange: `₹${camp.price || 1899} - ₹${camp.originalPrice || 4500}`,
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: (camp.rating || 4.9).toString(),
+          reviewCount: (camp.reviewsCount || 120).toString(),
+          bestRating: '5',
+          worstRating: '1'
+        },
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Munnar',
+          addressRegion: 'Kerala',
+          addressCountry: 'IN'
+        }
+      }
+    }))
+  };
+
+  // 3. Google FAQ Structured Data (FAQ Rich Accordions in SERP)
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Which are the best camps in Munnar?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The top-rated camps in Munnar are Kolukkumalai Sunrise Ridge Glamp (7,900 FT), Suryanelli Valley Camping, Meesapulimala Summit Basecamp, and Tentvilla Luxury Glamp. All feature gated perimeters, en-suite or modern washrooms with hot water, 4x4 sunrise safari, and campfire BBQ dinners.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'How much does a camp stay in Munnar cost?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Verified camp stays in Munnar start from ₹1,899 to ₹3,899 per person. Most packages include overnight tent/glamp stay, evening campfire with live barbecue, dinner, mountain breakfast, and guided sunrise treks.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Which is the top camp for Kolukkumalai sunrise safari?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Kolukkumalai Sunrise Ridge Glamp and Suryanelli Valley Basecamp are the top-rated camps for sunrise access, offering direct 4:30 AM 4x4 Jeep convoy departures to Tiger Rock (7,900 FT) above the cloud bed.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Is camping in Munnar safe for couples and solo female travelers?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. Aanandham verified campsites have private gated perimeters, dedicated male and female coordinators on-site 24/7, zero-tolerance safety protocols, and modern western washrooms with hot water.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'What food is included in Munnar camp packages?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Packages include evening tea and snacks, a live campfire barbecue (chicken and veg options), an authentic Kerala dinner buffet and a hot mountain breakfast with appam, puttu and poori. Extra barbecue platters and dining-bay meals can be added at select ridge camps.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Should I book a tent stay, dome, pod or cabin in Munnar?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Budget travellers and groups pick alpine tent stays from ₹1,899; couples love geodesic dome glamping from ₹2,300–₹3,299 for panoramic views; valley pods from ₹2,399 suit families wanting solid walls and decks; timber cabins suit larger groups. All include campfire evenings and guided treks.'
+        }
+      }
+    ]
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <CampsDirectoryClient
+        initialCamps={munnarCamps}
+        initialRegion="Munnar"
+        heroTitle={<>Top Camps in Munnar: <span style={{ color: '#D5ED55' }}>Best Camp Stays & Ridge Glamping</span></>}
+        heroSubtitle="Ranked #1 for high-altitude wilderness stays. Perched high above rolling cloud beds in Suryanelli, Kolukkumalai & Vattavada (6,000–7,900 FT). Enjoy private 4x4 sunrise summit convoys, starlit campfire barbecues, and premium ridge glamping tents."
+      />
+    </>
+  );
+}

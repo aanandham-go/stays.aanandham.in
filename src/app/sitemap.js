@@ -1,0 +1,80 @@
+import { INITIAL_ALL_CAMPS, DEPRECATED_CAMP_IDS } from '@/lib/campsData';
+import { getAllBlogSlugs } from '@/lib/blogPosts';
+
+export default function sitemap() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://stays.aanandham.in';
+  const currentDate = new Date().toISOString();
+
+  // Primary Money Pages & Core Landing Routes
+  const staticRoutes = [
+    {
+      url: `${siteUrl}`,
+      lastModified: currentDate,
+      changeFrequency: 'daily',
+      priority: 1.0,
+    },
+    {
+      url: `${siteUrl}/camps`,
+      lastModified: currentDate,
+      changeFrequency: 'daily',
+      priority: 0.95,
+    },
+    {
+      url: `${siteUrl}/camps/himachal`,
+      lastModified: currentDate,
+      changeFrequency: 'daily',
+      priority: 0.95,
+    },
+    {
+      url: `${siteUrl}/camps/munnar`,
+      lastModified: currentDate,
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
+      url: `${siteUrl}/treks`,
+      lastModified: currentDate,
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
+      url: `${siteUrl}/about`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/services`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/contact`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+  ];
+
+  // Dynamic Campsite Detail Booking Pages (High Priority, active camps only)
+  const campRoutes = INITIAL_ALL_CAMPS
+    .filter((camp) => !camp.archived && !DEPRECATED_CAMP_IDS.has(camp.id))
+    .map((camp) => ({
+      url: `${siteUrl}/camps/${camp.slug || camp.id}`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    }));
+
+  // Blog posts — the long-tail keyword engine (weekly crawl, mid priority)
+  const blogRoutes = getAllBlogSlugs().map((slug) => ({
+    url: `${siteUrl}/blog/${slug}`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly',
+    priority: 0.7,
+  }));
+
+  // Note: /login, /signup, /admin are omitted from sitemap to prevent crawl budget dilution
+  return [...staticRoutes, ...campRoutes, ...blogRoutes];
+}

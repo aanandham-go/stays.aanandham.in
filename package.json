@@ -1,0 +1,41 @@
+{
+  "name": "stays-aanandham-go",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "meta-audit": "node scripts/meta-audit.mjs",
+    "link-check": "node scripts/link-check.mjs",
+    "validate-data": "node scripts/validate-data.mjs",
+    "test": "node --test __tests__/*.test.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "@supabase/supabase-js": "^2.112.3",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
+    "framer-motion": "^12.4.7",
+    "jsqr": "^1.4.0",
+    "lenis": "^1.3.26",
+    "lucide-react": "^1.31.0",
+    "next": "^15.2.1",
+    "pdfkit": "^0.19.1",
+    "pg": "^8.23.1",
+    "qrcode": "^1.5.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "resend": "^6.20.0",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "prisma": "^6.19.3",
+    "typescript": "^5"
+  }
+}

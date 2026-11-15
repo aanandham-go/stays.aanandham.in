@@ -1,0 +1,105 @@
+﻿import { NextResponse } from 'next/server';
+import { getClientIp, getAdminPayload } from '@/lib/authConfig';
+import { checkRateLimit, isIpBlocked } from '@/lib/redis';
+import { getStoredInquiries, addStoredInquiry } from '@/lib/inquiryStore';
+import { sanitizeLogOutput } from '@/lib/dlpSanitizer';
+import { checkSecurityGate } from '@/lib/securityTracker';
+import { requestPms, pmsTenantId } from '@/lib/pmsServerBridge';
+
+export async function GET(request) {
+    const admin = await getAdminPayload(request);
+    if (!admin || !admin.isAdmin) {
+        return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const url = new URL(request.url);
+    const limit = Number(url.searchParams.get('limit')) || 100;
+    const offset = Number(url.searchParams.get('offset')) || 0;
+
+    const inquiries = await getStoredInquiries({ limit, offset });
+    return NextResponse.json({ success: true, inquiries });
+}
+
+export async function POST(request) {
+    const ip = getClientIp(request);
+
+    if (await isIpBlocked(ip)) {
+        return NextResponse.json({ success: false, message: 'Access restricted.' }, { status: 403 });
+    }
+
+    const gate = checkSecurityGate(request, String(request.headers.get('x-device-fingerprint') || '').slice(0, 400));
+    if (!gate.allowed) {
+        return NextResponse.json({ success: false, message: gate.reason || 'Access restricted.' }, { status: gate.status || 403 });
+    }
+
+    const rateLimit = await checkRateLimit(`ratelimit:inquiry:${ip}`, 5, 120);
+    if (!rateLimit.allowed) {
+        return NextResponse.json({ success: false, message: 'Too many requests. Please wait a minute.' }, { status: 429 });
+    }
+
+    try {
+        const body = await request.json();
+
+        if (body.honeypot && String(body.honeypot).trim().length > 0) {
+            return NextResponse.json({ success: true, message: 'Inquiry received' });
+        }
+
+        const name = String(body.name || '').trim().slice(0, 120);
+        const phone = String(body.phone || 'N/A').trim().slice(0, 24);
+        const inquiryType = String(body.inquiryType || 'general').trim().slice(0, 40);
+        const guests = Number(body.guests) || 2;
+        const travelDates = String(body.travelDates || 'Flexible').trim().slice(0, 60);
+        const message = String(body.message || '').trim().slice(0, 2000);
+        const source = String(body.source || 'Contact Form').trim().slice(0, 80);
+
+        if (!name) {
+            return NextResponse.json({ success: false, message: 'Name is required.' }, { status: 400 });
+        }
+
+        const newRecord = {
+            name,
+            phone,
+            email: String(body.email || '').trim().slice(0, 200),
+            inquiryType,
+            guests,
+            travelDates,
+            message,
+            source,
+            createdAt: new Date().toISOString()
+        };
+
+        // PMS owns the lead; never acknowledge a local-only inquiry as delivered.
+        let pmsResult;
+        try {
+            pmsResult = await requestPms('/api/inquiries', {
+                method: 'POST',
+                body: {
+                    name,
+                    phone,
+                    email: newRecord.email,
+                    inquiryType,
+                    guests,
+                    travelDates,
+                    message,
+                    source: source || 'Aanandham.go Website',
+                    tenantId: pmsTenantId(),
+                    campsiteId: body.campsiteId || null,
+                    status: 'NEW_LEAD'
+                },
+                timeoutMs: 10000
+            });
+        } catch {
+            return NextResponse.json({ success: false, message: 'Inquiry service is temporarily unavailable. Please contact the property directly.' }, { status: 503 });
+        }
+        if (!pmsResult.payload.success) return NextResponse.json(pmsResult.payload, { status: pmsResult.status });
+
+        // Compatibility mirror for the existing website admin view; it is not authoritative.
+        const inquiryId = pmsResult.payload.inquiryId || pmsResult.payload.inquiry?.id;
+        await addStoredInquiry({ ...newRecord, id: inquiryId }).catch((error) => console.error(sanitizeLogOutput(`[INQUIRY MIRROR ERROR] ${error.message}`)));
+        return NextResponse.json({ success: true, inquiryId, message: 'Inquiry received.' });
+    } catch (err) {
+        console.error(sanitizeLogOutput(`[INQUIRY API ERROR] ${err.message}`));
+        return NextResponse.json({ success: false, message: 'Server error processing inquiry.' }, { status: 500 });
+    }
+}
+
