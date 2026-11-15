@@ -1230,8 +1230,8 @@ export const BLOG_POSTS = [
     date: '2026-10-16',
     readMinutes: 8,
     category: 'Planning Guides',
-    image: '/images/treks/kheerganga-trek-parvati-valley.jpg',
-    imageAlt: 'Snow covered alpine pine forests and mountain ridges in Kalga and Kasol during December winter',
+    image: '/images/treks/himachal-december-snow-trek.jpg',
+    imageAlt: 'Trekkers hiking through snowy alpine slopes and pine forests during December in Himachal Pradesh',
     excerpt: 'Heading to Parvati Valley for December snow or Christmas & New Year celebrations? Here is your complete winter field guide: snowfall timings, heated rooms from ₹249, winter Kheerganga trek, and campfire festivities.',
     keywords: [
       'kasol in december',

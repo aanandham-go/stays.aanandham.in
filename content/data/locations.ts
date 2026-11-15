@@ -25,8 +25,8 @@ export const locationsData: LocationData[] = [
     seoDescription: 'Find solar-powered boutique stays, dorm beds, and sunrise balcony suites in Kalga Village, Kasol. Clean western washrooms and homecooked Pahadi meals.',
     description: 'A serene apple-orchard village above Barshaini where motorized roads end. Perched at 7,900 FT overlooking snow peaks and deodar ridges in Parvati Valley.',
     heroImage: {
-      url: '/images/high-altitude-ridge-tent.jpg',
-      alt: 'Kalga village pine forest and wooden alpine cottages overlooking Parvati Valley',
+      url: '/images/treks/kheerganga-trek-parvati-valley.jpg',
+      alt: 'Trekkers traversing the scenic alpine pine trails and apple orchards above Kalga Village in Parvati Valley',
       width: 1200,
       height: 630
     },
@@ -73,8 +73,8 @@ export const locationsData: LocationData[] = [
     seoDescription: 'Book authentic mountain stays and riverside retreats across Kasol and Parvati Valley. Experience crisp pine air, campfire evenings, and local hospitality.',
     description: 'The scenic basecamp of Parvati Valley flanked by roaring river streams, Israeli cafes, and soaring Himalayan pine trees.',
     heroImage: {
-      url: '/images/experienced-local-guides.jpg',
-      alt: 'Scenic pine river banks and mountain valley around Kasol Himachal Pradesh',
+      url: '/images/treks/kasol-parvati-river-trail.jpg',
+      alt: 'Trekkers traversing the scenic pine river banks and suspension bridge trails around Kasol Himachal Pradesh',
       width: 1200,
       height: 630
     },

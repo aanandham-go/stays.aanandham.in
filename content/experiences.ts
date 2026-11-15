@@ -52,7 +52,7 @@ export const experiencesData: ExperienceItem[] = [
     duration: '3 Hours',
     altitude: '6,400 ft',
     description: 'Walk through secluded wooden bridge paths over pristine alpine streams in Tirthan Valley, discovering hidden waterfalls and learning local Pahadi folklore.',
-    image: '/images/anayirangal-elephant-lake.jpg',
-    imageAlt: 'Clear mountain freshwater stream running through lush pine forests and natural wooden footbridges in Himachal',
+    image: '/images/experiences/jibhi-waterfall-bridge-trail.jpg',
+    imageAlt: 'Wooden footbridge and hikers walking along the pristine pine waterfall stream trail in Jibhi Tirthan Valley Himachal',
   },
 ];

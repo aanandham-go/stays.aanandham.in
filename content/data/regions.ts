@@ -19,8 +19,8 @@ export const regionsData: RegionData[] = [
     description: 'Boutique mountain retreats, sunrise balconies, and backpacker dorms tucked within uncommercialized pine villages of Parvati Valley.',
     weight: 1, // Himachal-first priority
     heroImage: {
-      url: '/images/high-altitude-ridge-tent.jpg',
-      alt: 'Scenic pine forest valley and Himalayan peaks in Himachal Pradesh',
+      url: '/images/treks/parvati-valley-himachal-hero.jpg',
+      alt: 'Trekkers navigating scenic high-altitude alpine trails and snow peaks in Himachal Pradesh',
       width: 1200,
       height: 630
     },

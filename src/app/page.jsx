@@ -33,10 +33,10 @@ const OVERVIEW_HIGHLIGHTS = [
         objectPosition: 'center 60%'
     },
     {
-        img: '/images/sunrise-cloud-treks.jpg',
-        title: '7,900 FT Alpine Stays & Apple Orchards',
-        sub: 'Boutique wood stays & orchard sanctuaries above Barshaini',
-        objectPosition: 'center 70%'
+        img: '/images/treks/kheerganga-trek-parvati-valley.jpg',
+        title: '7,900 FT Alpine Trails & Apple Orchards',
+        sub: 'Guided pine treks & orchard trails starting from Kalga Village',
+        objectPosition: 'center 60%'
     },
     {
         img: '/images/acoustic-campfires-bbq.jpg',

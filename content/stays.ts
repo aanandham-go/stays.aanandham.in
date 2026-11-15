@@ -84,8 +84,8 @@ export const staysData: StayItem[] = [
         alt: 'Milky Way galaxy stretching across crisp Himalayan mountain night skies',
       },
       {
-        url: '/images/kolukkumalai-cozy-tent-stay.jpg',
-        alt: 'Cozy wooden-floored dome interior with warm lighting and thermal heating in Himachal',
+        url: '/images/treks/parvati-valley-himachal-hero.jpg',
+        alt: 'Trekkers navigating scenic Himalayan mountain trails and snow peaks in Himachal Pradesh',
       },
     ],
     amenities: ['Bukhari Wood Heater', 'Stargazing Telescope', 'Apple Orchard Walk', 'Artisanal Himalayan Cafe', 'High-Speed Wi-Fi'],
