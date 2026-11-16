@@ -57,7 +57,7 @@ const WHY_AANANDHAM_PILLARS = [
         title: '100% Safe For Solo & Families',
         fullTitle: '100% Female & Family-Safe Stays',
         desc: 'We eliminate uncertainty from mountain stays. Every property features private gated perimeters, dedicated on-site caretakers, clean modern western washrooms with running hot water, and 24/7 power backup.',
-        image: '/images/munnar-mist-valley-wide.jpg',
+        image: '/images/treks/parvati-valley-himachal-hero.jpg',
         stat: 'Zero Safety Incidents',
         statIcon: ShieldCheck,
         rotation: '-1.2deg',
@@ -74,7 +74,7 @@ const WHY_AANANDHAM_PILLARS = [
         title: 'Handpicked Mountain Stays',
         fullTitle: 'Owner-Operated Highland Sanctuaries',
         desc: 'We do not aggregate generic town hotels. Every property is personally inspected for its scenic ridge location, peaceful soul, and comfort — from pine retreats in Kasol to sunrise sky decks and timber cabins in Munnar.',
-        image: '/images/services/munnar-hero-landing.jpg',
+        image: '/images/treks/kasol-parvati-river-trail.jpg',
         stat: 'Owner-Operated Stays',
         statIcon: Mountain,
         rotation: '1.4deg',
@@ -353,8 +353,8 @@ function CtaParallaxBanner({ onOpenBooking, defaultPackage }) {
                         }}
                     >
                         <Image
-                            src="/images/services/munnar-hero-landing.jpg"
-                            alt="Highland Stays & Sanctuaries"
+                            src="/images/treks/parvati-valley-himachal-hero.jpg"
+                            alt="Highland Stays & Alpine Sanctuaries in Himachal Pradesh"
                             fill
                             priority
                             sizes="100vw"

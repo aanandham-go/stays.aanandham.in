@@ -386,12 +386,12 @@ export default function ServicesPage() {
                         overflow: 'hidden'
                     }}
                 >
-                    {/* Atmospheric Real Munnar Tea Hills Landscape Background */}
+                    {/* Atmospheric Real Himachal Mountain Landscape Background */}
                     <div
                         style={{
                             position: 'absolute',
                             inset: 0,
-                            backgroundImage: 'url("/images/services/munnar-hero-landing.jpg")',
+                            backgroundImage: 'url("/images/treks/parvati-valley-himachal-hero.jpg")',
                             backgroundSize: 'cover',
                             backgroundPosition: 'center 42%',
                             filter: 'brightness(0.58) saturate(1.15)',

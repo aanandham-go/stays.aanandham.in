@@ -755,8 +755,8 @@ export const BLOG_POSTS = [
     date: '2026-09-22',
     readMinutes: 7,
     category: 'Camping Guides',
-    image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=80',
-    imageAlt: 'Affordable dorm stay bunk beds for backpackers in Himachal',
+    image: '/images/the-nest-kalga-apple-orchard.jpg',
+    imageAlt: 'The Nest Kalga mountain homestay and backpacker dorms surrounded by apple orchards in Parvati Valley',
     excerpt: 'Parvati Valley does not have to be expensive. Here is what dorm beds and budget rooms in Kasol–Kalga really cost in 2026 — and how to pick an affordable stay that still includes hot showers, meals and mountain views.',
     keywords: [
       'affordable stays in himachal',
@@ -825,8 +825,8 @@ export const BLOG_POSTS = [
     date: '2026-09-21',
     readMinutes: 6,
     category: 'Camping Guides',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80',
-    imageAlt: 'Scenic Himalayan sunrise over pine valleys in Parvati Valley Himachal',
+    image: '/images/treks/parvati-valley-himachal-hero.jpg',
+    imageAlt: 'Scenic Himalayan sunrise over snow peaks and pine valleys in Parvati Valley Himachal',
     excerpt: 'Everyone photographs the Parvati Valley — few stays actually face the sunrise. Here is how to pick a genuinely scenic stay: sunrise orientation, balcony math, stargazing darkness and the Kalga benchmark.',
     keywords: [
       'scenic stays in himachal',
