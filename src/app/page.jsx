@@ -1022,34 +1022,22 @@ export default function HomePage() {
                         </a>
                     </motion.div>
 
-                    {/* Compact Bottom Highland Summary Pill */}
+                    {/* Minimal Highland Hero Highlights Pill */}
                     <motion.div 
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.3 }}
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexWrap: 'wrap',
-                            gap: '8px 14px',
-                            background: 'rgba(0, 0, 0, 0.45)',
-                            border: '1px solid rgba(213, 237, 85, 0.22)',
-                            borderRadius: '999px',
-                            padding: '7px 22px',
-                            backdropFilter: 'blur(12px)',
-                            maxWidth: '100%'
-                        }}
+                        className="hero-summary-pill"
                     >
-                        <span style={{ fontSize: '13px', fontWeight: '700', color: '#D5ED55' }}>
-                            The Nest Kalga (Parvati Valley · Dorms from ₹249)
+                        <span style={{ fontWeight: '800', color: '#D5ED55' }}>
+                            Kalga Dorms from ₹249
                         </span>
-                        <span style={{ color: 'rgba(255,255,255,0.3)' }}>•</span>
-                        <span style={{ fontSize: '13px', color: '#E1EAE3', fontWeight: '500' }}>
-                            Kolukkumalai Teddy&apos;s (Munnar · Sky Deck)
+                        <span style={{ color: 'rgba(255,255,255,0.35)', userSelect: 'none' }}>•</span>
+                        <span style={{ color: '#FFFFFF', fontWeight: '600' }}>
+                            Munnar Sky Deck
                         </span>
-                        <span style={{ color: 'rgba(255,255,255,0.3)' }}>•</span>
-                        <span style={{ fontSize: '12px', color: '#9EB4A2', fontWeight: '600' }}>
+                        <span style={{ color: 'rgba(255,255,255,0.35)', userSelect: 'none' }}>•</span>
+                        <span style={{ color: '#A3B1A7', fontWeight: '600' }}>
                             Zero Commission
                         </span>
                     </motion.div>

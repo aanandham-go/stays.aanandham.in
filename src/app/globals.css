@@ -1897,6 +1897,35 @@ body::-webkit-scrollbar-thumb:active,
   color: #FFFFFF !important;
 }
 
+/* Minimal Highland Hero Highlights Pill */
+.hero-summary-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  background: rgba(11, 21, 14, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 5px 18px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  max-width: 100%;
+  font-size: 12.5px;
+  line-height: 1.4;
+  margin-top: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 640px) {
+  .hero-summary-pill {
+    padding: 4px 12px;
+    font-size: 11px;
+    gap: 4px 8px;
+    background: rgba(11, 21, 14, 0.78);
+  }
+}
+
 /* ─────────────────────────────────────────────────────────────
    BOOKING ENGINE MODAL (Fullscreen Native Mobile Perfection)
 ───────────────────────────────────────────────────────────── */
