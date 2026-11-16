@@ -85,11 +85,12 @@ export default function BlogIndexPage() {
       <main style={{ fontFamily: 'var(--font-jakarta), "Plus Jakarta Sans", sans-serif', backgroundColor: '#F8F9F5', color: '#121613', minHeight: '100vh' }}>
         {/* ── HERO: MATCHES CAMPS/ABOUT LANDING DESIGN ── */}
         <section style={{
-          background: 'linear-gradient(180deg, #101E13 0%, #0D170F 100%)',
-          color: '#FFFFFF',
-          padding: 'clamp(115px, 12vw, 150px) clamp(20px, 4vw, 48px) clamp(44px, 6vw, 72px)',
+          background: '#F8F9F5',
+          color: '#121613',
+          padding: 'clamp(115px, 12vw, 145px) clamp(20px, 4vw, 48px) clamp(44px, 6vw, 68px)',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          borderBottom: '1px solid rgba(18, 22, 19, 0.08)'
         }}>
           {/* Ambient Glow */}
           <div style={{
@@ -99,7 +100,7 @@ export default function BlogIndexPage() {
             transform: 'translateX(-50%)',
             width: '700px',
             height: '350px',
-            background: 'radial-gradient(circle, rgba(213, 237, 85, 0.12) 0%, rgba(16, 30, 19, 0) 70%)',
+            background: 'radial-gradient(circle, rgba(27, 77, 62, 0.05) 0%, rgba(248, 249, 245, 0) 70%)',
             pointerEvents: 'none',
             filter: 'blur(60px)'
           }} />
@@ -107,14 +108,34 @@ export default function BlogIndexPage() {
           <div style={{ maxWidth: '1440px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
             <div style={{ maxWidth: '820px' }}>
               {/* Visual Breadcrumb */}
-              <nav aria-label="Breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#A2B6A6', marginBottom: '14px', flexWrap: 'wrap', fontWeight: '600' }}>
-                <Link href="/" style={{ color: '#A2B6A6', textDecoration: 'none', transition: 'color 0.2s' }}>Home</Link>
-                <span style={{ color: '#5A6E5F' }}>/</span>
-                <span style={{ color: '#D5ED55', fontWeight: '700' }}>Field Guides & Blog</span>
+              <nav aria-label="Breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#59655D', marginBottom: '14px', flexWrap: 'wrap', fontWeight: '600' }}>
+                <Link href="/" style={{ color: '#59655D', textDecoration: 'none', transition: 'color 0.2s' }}>Home</Link>
+                <span style={{ color: 'rgba(18, 22, 19, 0.25)' }}>/</span>
+                <span style={{ color: '#166534', fontWeight: '800' }}>Field Guides &amp; Blog</span>
               </nav>
 
-              <div className="star-badge dark-section" style={{ background: 'rgba(213, 237, 85, 0.15)', color: '#D5ED55', border: '1px solid rgba(213, 237, 85, 0.3)', marginBottom: '16px' }}>
-                <span className="star-icon">★</span> Mountain Field Journal
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'rgba(27, 77, 62, 0.08)',
+                border: '1px solid rgba(27, 77, 62, 0.2)',
+                borderRadius: '999px',
+                padding: '5px 14px',
+                marginBottom: '16px'
+              }}>
+                <span style={{
+                  width: '7px',
+                  height: '7px',
+                  borderRadius: '50%',
+                  background: '#166534',
+                  boxShadow: '0 0 8px #166534',
+                  display: 'inline-block',
+                  animation: 'pulse-dot 1.8s ease-in-out infinite'
+                }} />
+                <span style={{ fontSize: '11px', fontWeight: 900, color: '#166534', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                  Mountain Field Journal · Himachal &amp; Munnar
+                </span>
               </div>
 
               <h1 style={{
@@ -124,36 +145,41 @@ export default function BlogIndexPage() {
                 letterSpacing: '-0.035em',
                 lineHeight: 1.15,
                 margin: '0 0 16px',
-                color: '#FFFFFF'
+                color: '#121613'
               }}>
-                Himachal & Munnar <span style={{ color: '#D5ED55' }}>Stays & Travel Guides</span>
+                Himachal &amp; Munnar <span style={{ color: '#1B4D3E' }}>Stays &amp; Travel Guides</span>
               </h1>
 
               <p style={{
                 fontSize: 'clamp(15px, 1.8vw, 17px)',
-                color: '#A2B6A6',
+                color: '#4A554D',
                 lineHeight: 1.7,
                 margin: '0 0 28px'
               }}>
-                Honest field guides from our mountain stays — Kalga Parvati Valley dorms from ₹249, Kolukkumalai sunrise sky decks, packing lists, itineraries, and highland travel advice. Written for people planning their mountain escape.
+                Honest field guides, high-altitude trail notes, village culture chronicles, and accommodation advice curated by resident mountain hosts in Kalga Village (Parvati Valley) and Kolukkumalai (Munnar).
               </p>
 
               <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
                 <Link
                   href="/camps"
-                  className="btn-lime"
                   style={{
-                    padding: '13px 30px',
-                    fontSize: '14.5px',
-                    fontWeight: '900',
+                    padding: '12px 28px',
+                    borderRadius: '999px',
+                    background: '#121613',
+                    color: '#FFFFFF',
+                    fontSize: '14px',
+                    fontWeight: '800',
                     textDecoration: 'none',
-                    boxShadow: '0 10px 30px rgba(213, 237, 85, 0.3)'
+                    boxShadow: '0 4px 14px rgba(18, 22, 19, 0.12)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
                   }}
                 >
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>Explore Our Camps →</span>
+                  <span>Explore Our Stays →</span>
                 </Link>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#A2B6A6', fontWeight: '700' }}>
-                  <Clock size={15} /> {BLOG_POSTS.length} field guides · updated {new Date(sorted[0].date).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#59655D', fontWeight: '700' }}>
+                  <Clock size={15} color="#166534" /> {BLOG_POSTS.length} field guides · updated {new Date(sorted[0].date).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
                 </span>
               </div>
             </div>

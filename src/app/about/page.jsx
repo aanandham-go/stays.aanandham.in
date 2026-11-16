@@ -343,7 +343,7 @@ export default function AboutPage() {
                         <nav aria-label="Breadcrumb" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginBottom: '20px', fontSize: '13px', color: '#A2B6A6' }}>
                             <Link href="/" style={{ color: '#E1E9E2', textDecoration: 'none' }}>Home</Link>
                             <span>/</span>
-                            <span style={{ color: '#D5ED55', fontWeight: '700' }}>About Aanandham Stays</span>
+                            <span style={{ color: '#166534', fontWeight: '800' }}>About Aanandham Stays</span>
                         </nav>
 
                         {/* Top Star Badge */}
@@ -351,8 +351,8 @@ export default function AboutPage() {
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '8px',
-                            background: 'rgba(213, 237, 85, 0.14)',
-                            border: '1px solid rgba(213, 237, 85, 0.35)',
+                            background: 'rgba(229, 169, 59, 0.16)',
+                            border: '1px solid rgba(229, 169, 59, 0.35)',
                             borderRadius: '999px',
                             padding: '6px 18px',
                             marginBottom: '20px'
@@ -361,11 +361,11 @@ export default function AboutPage() {
                                 width: '7px',
                                 height: '7px',
                                 borderRadius: '50%',
-                                background: '#D5ED55',
-                                boxShadow: '0 0 8px #D5ED55',
+                                background: '#E5A93B',
+                                boxShadow: '0 0 8px #E5A93B',
                                 display: 'inline-block'
                             }} />
-                            <span style={{ fontSize: '11px', fontWeight: '900', color: '#D5ED55', letterSpacing: '1.2px', textTransform: 'uppercase' }}>
+                            <span style={{ fontSize: '11px', fontWeight: '900', color: '#E5A93B', letterSpacing: '1.2px', textTransform: 'uppercase' }}>
                                 OUR STORY · HIMACHAL &amp; MUNNAR
                             </span>
                         </div>
@@ -388,7 +388,7 @@ export default function AboutPage() {
                         >
                             Our Story &amp; Highland Ethos
                             <br />
-                            <span style={{ fontSize: '0.6em', fontWeight: '700', color: '#D5ED55', letterSpacing: '-0.02em' }}>
+                            <span style={{ fontSize: '0.6em', fontWeight: '700', color: '#E5A93B', letterSpacing: '-0.02em' }}>
                                 Out of the Classroom, Into the Mountains
                             </span>
                         </motion.h1>
@@ -457,7 +457,7 @@ export default function AboutPage() {
                                 }}
                             >
                                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                                    <Mountain size={15} color="#D5ED55" /> The Nest Kalga Basecamp ↓
+                                    <Mountain size={15} color="#E5A93B" /> The Nest Kalga Basecamp ↓
                                 </span>
                             </a>
 
@@ -480,7 +480,7 @@ export default function AboutPage() {
                                 }}
                             >
                                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                                    <Footprints size={15} color="#D5ED55" /> Guided Alpine Treks →
+                                    <Footprints size={15} color="#E5A93B" /> Guided Alpine Treks →
                                 </span>
                             </Link>
                         </motion.div>
@@ -502,7 +502,7 @@ export default function AboutPage() {
                             { icon: Mountain, label: '7,900 FT THE NEST KALGA · PARVATI VALLEY', highlight: true },
                             { icon: Tent, label: 'BUDGET MOUNTAIN DORMS FROM ₹249 · WI-FI & SOLAR POWER' }
                         ].map((item, idx) => (
-                            <div key={idx} className="marquee-item" style={{ color: item.highlight ? '#D5ED55' : '#FFFFFF' }}>
+                            <div key={idx} className="marquee-item" style={{ color: item.highlight ? '#E5A93B' : '#FFFFFF' }}>
                                 <item.icon size={16} strokeWidth={2.4} />
                                 <span>{item.label}</span>
                             </div>
@@ -979,7 +979,7 @@ export default function AboutPage() {
 
                     <div style={{ width: '100%', maxWidth: 'min(100%, 1340px)', margin: '0 auto', position: 'relative', zIndex: 2, boxSizing: 'border-box' }}>
                         <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-                            <div className="star-badge" style={{ margin: '0 auto 16px', background: 'rgba(213, 237, 85, 0.12)', border: '1px solid rgba(213, 237, 85, 0.35)', color: '#D5ED55' }}>
+                            <div className="star-badge" style={{ margin: '0 auto 16px', background: 'rgba(27, 77, 62, 0.08)', border: '1px solid rgba(27, 77, 62, 0.2)', color: '#166534' }}>
                                 <span className="star-icon">★</span> OUR CORE ETHOS
                             </div>
                             <h2 style={{
@@ -990,7 +990,7 @@ export default function AboutPage() {
                                 letterSpacing: '-0.03em',
                                 margin: '0 0 16px'
                             }}>
-                                The 4 Pillars of <span style={{ color: '#D5ED55' }}>Aanandham Hospitality</span>
+                                The 4 Pillars of <span style={{ color: '#1B4D3E' }}>Aanandham Hospitality</span>
                             </h2>
                             <p style={{ fontSize: '16px', color: '#A2B6A6', maxWidth: '640px', margin: '0 auto', lineHeight: 1.65 }}>
                                 Four guiding commitments carved into every sanctuary we verify and operate across Himachal Pradesh and Munnar.
@@ -1271,7 +1271,7 @@ export default function AboutPage() {
                             marginBottom: '42px'
                         }}>
                             <div>
-                                <div className="star-badge" style={{ marginBottom: '14px', background: 'rgba(213,237,85,0.12)', border: '1px solid rgba(213,237,85,0.3)', color: '#D5ED55' }}>
+                                <div className="star-badge" style={{ marginBottom: '14px', background: 'rgba(27, 77, 62, 0.08)', border: '1px solid rgba(27, 77, 62, 0.2)', color: '#166534' }}>
                                     <span className="star-icon">★</span> GUEST STORIES &amp; REVIEWS
                                 </div>
                                 <h2 style={{

@@ -572,37 +572,37 @@ return (
                                 <div className="camp-hero-badges" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', flexWrap: 'wrap' }}>
                                     {isAanandhamStays ? (
                                         <span className="camp-hero-badge" style={{
-                                            background: 'rgba(213, 237, 85, 0.15)',
-                                            color: '#D5ED55',
+                                            background: 'rgba(27, 77, 62, 0.08)',
+                                            color: '#1B4D3E',
                                             fontSize: '11.5px',
                                             fontWeight: '900',
                                             padding: '5px 12px',
                                             borderRadius: '999px',
-                                            border: '1px solid rgba(213, 237, 85, 0.4)',
+                                            border: '1px solid rgba(27, 77, 62, 0.22)',
                                             display: 'inline-flex',
                                             alignItems: 'center',
                                             gap: '5px'
                                         }}>
-                                            <span style={{ width: '13px', height: '13px', borderRadius: '50%', background: '#D5ED55', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <Check size={8} color="#121613" strokeWidth={3.5} />
+                                            <span style={{ width: '13px', height: '13px', borderRadius: '50%', background: '#1B4D3E', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <Check size={8} color="#FFFFFF" strokeWidth={3.5} />
                                             </span>
                                             by Aanandham.Stays
                                         </span>
                                     ) : (
                                         <span className="camp-hero-badge" style={{
-                                            background: '#121613',
-                                            color: '#D5ED55',
+                                            background: 'rgba(18, 22, 19, 0.06)',
+                                            color: '#121613',
                                             fontSize: '11.5px',
-                                            fontWeight: '900',
+                                            fontWeight: '800',
                                             padding: '5px 12px',
                                             borderRadius: '999px',
-                                            border: '1px solid rgba(213, 237, 85, 0.3)',
+                                            border: '1px solid rgba(18, 22, 19, 0.12)',
                                             display: 'inline-flex',
                                             alignItems: 'center',
                                             gap: '5px'
                                         }}>
-                                            <span style={{ width: '13px', height: '13px', borderRadius: '50%', background: '#D5ED55', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <Check size={8} color="#121613" strokeWidth={3.5} />
+                                            <span style={{ width: '13px', height: '13px', borderRadius: '50%', background: '#166534', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <Check size={8} color="#FFFFFF" strokeWidth={3.5} />
                                             </span>
                                             Verified
                                         </span>

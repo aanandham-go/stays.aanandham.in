@@ -35,7 +35,7 @@ export default function TreksPage() {
   });
 
   return (
-    <div style={{ backgroundColor: '#070D09', color: '#FFFFFF', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ backgroundColor: '#F8F9F5', color: '#121613', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <SiteHeader transparentOnTop={false} activePage="treks" />
 
       <main id="main-content" style={{ flex: 1 }}>
@@ -43,9 +43,9 @@ export default function TreksPage() {
         <section
           style={{
             position: 'relative',
-            padding: 'clamp(90px, 10vw, 130px) clamp(20px, 4vw, 48px) clamp(50px, 6vw, 70px)',
-            background: 'linear-gradient(180deg, #070D09 0%, #0D1711 100%)',
-            borderBottom: '1px solid rgba(213,237,85,0.12)',
+            padding: 'clamp(115px, 12vw, 145px) clamp(20px, 4vw, 48px) clamp(44px, 6vw, 68px)',
+            background: '#F8F9F5',
+            borderBottom: '1px solid rgba(18, 22, 19, 0.08)',
             overflow: 'hidden'
           }}
         >
@@ -53,42 +53,32 @@ export default function TreksPage() {
           <div
             style={{
               position: 'absolute',
-              top: '-20%',
-              left: '10%',
-              width: '500px',
-              height: '500px',
+              top: '-120px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '700px',
+              height: '350px',
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(213,237,85,0.08) 0%, transparent 70%)',
-              pointerEvents: 'none'
-            }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '-20%',
-              right: '10%',
-              width: '450px',
-              height: '450px',
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(34,197,94,0.07) 0%, transparent 70%)',
-              pointerEvents: 'none'
+              background: 'radial-gradient(circle, rgba(27,77,62,0.05) 0%, transparent 70%)',
+              pointerEvents: 'none',
+              filter: 'blur(60px)'
             }}
           />
 
           <div style={CONTAINER}>
             {/* Breadcrumb Navigation */}
-            <nav aria-label="Breadcrumb" style={{ marginBottom: '20px' }}>
-              <ol style={{ display: 'flex', alignItems: 'center', gap: '8px', listStyle: 'none', padding: 0, margin: 0, fontSize: '13px', color: '#8E9B92' }}>
+            <nav aria-label="Breadcrumb" style={{ marginBottom: '16px' }}>
+              <ol style={{ display: 'flex', alignItems: 'center', gap: '8px', listStyle: 'none', padding: 0, margin: 0, fontSize: '13px', color: '#59655D' }}>
                 <li>
-                  <Link href="/" style={{ color: '#A2B6A6', textDecoration: 'none', transition: 'color 0.2s' }}>
+                  <Link href="/" style={{ color: '#59655D', textDecoration: 'none', transition: 'color 0.2s' }}>
                     Home
                   </Link>
                 </li>
                 <li>
-                  <ChevronRight size={13} color="#8E9B92" />
+                  <ChevronRight size={13} color="rgba(18, 22, 19, 0.25)" />
                 </li>
                 <li>
-                  <span style={{ color: '#D5ED55', fontWeight: 700 }} aria-current="page">
+                  <span style={{ color: '#166534', fontWeight: 800 }} aria-current="page">
                     Guided Alpine Treks
                   </span>
                 </li>
@@ -101,15 +91,23 @@ export default function TreksPage() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  background: 'rgba(213,237,85,0.12)',
-                  border: '1px solid rgba(213,237,85,0.3)',
+                  background: 'rgba(27,77,62,0.08)',
+                  border: '1px solid rgba(27,77,62,0.2)',
                   borderRadius: '999px',
-                  padding: '6px 16px',
-                  marginBottom: '18px'
+                  padding: '5px 14px',
+                  marginBottom: '16px'
                 }}
               >
-                <Footprints size={14} color="#D5ED55" />
-                <span style={{ fontSize: '11px', fontWeight: 900, color: '#D5ED55', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                <span style={{
+                  width: '7px',
+                  height: '7px',
+                  borderRadius: '50%',
+                  background: '#166534',
+                  boxShadow: '0 0 8px #166534',
+                  display: 'inline-block',
+                  animation: 'pulse-dot 1.8s ease-in-out infinite'
+                }} />
+                <span style={{ fontSize: '11px', fontWeight: 900, color: '#166534', letterSpacing: '1px', textTransform: 'uppercase' }}>
                   Parvati Valley Himalayan Basecamp · 7,900 FT to 11,500 FT
                 </span>
               </div>
@@ -119,19 +117,19 @@ export default function TreksPage() {
                   fontFamily: 'var(--font-heading)',
                   fontSize: 'clamp(32px, 5.5vw, 54px)',
                   fontWeight: 900,
-                  color: '#FFFFFF',
+                  color: '#121613',
                   margin: '0 0 16px',
                   letterSpacing: '-0.035em',
                   lineHeight: 1.15
                 }}
               >
-                Guided Alpine Treks in Parvati Valley
+                Guided Alpine Treks in <span style={{ color: '#1B4D3E' }}>Parvati Valley</span>
               </h1>
 
               <p
                 style={{
                   fontSize: 'clamp(15px, 1.6vw, 17px)',
-                  color: '#A2B6A6',
+                  color: '#4A554D',
                   lineHeight: 1.7,
                   margin: '0 0 28px',
                   maxWidth: '720px'
@@ -142,16 +140,16 @@ export default function TreksPage() {
 
               {/* Trust Badges Row */}
               <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#FFFFFF', fontWeight: 700 }}>
-                  <ShieldCheck size={16} color="#D5ED55" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#121613', fontWeight: 700 }}>
+                  <ShieldCheck size={16} color="#166534" />
                   <span>Certified Local Guides</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#FFFFFF', fontWeight: 700 }}>
-                  <Flame size={16} color="#D5ED55" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#121613', fontWeight: 700 }}>
+                  <Flame size={16} color="#166534" />
                   <span>Warm Meals &amp; Campfires</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#FFFFFF', fontWeight: 700 }}>
-                  <Compass size={16} color="#D5ED55" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#121613', fontWeight: 700 }}>
+                  <Compass size={16} color="#166534" />
                   <span>Zero Middleman Tariffs</span>
                 </div>
               </div>
@@ -160,7 +158,7 @@ export default function TreksPage() {
         </section>
 
         {/* ── TREKS LISTING & FILTER BAR ── */}
-        <section style={{ padding: 'clamp(48px, 6vw, 80px) clamp(20px, 4vw, 48px)', background: '#09120C' }}>
+        <section style={{ padding: 'clamp(48px, 6vw, 80px) clamp(20px, 4vw, 48px)', background: '#F8F9F5' }}>
           <div style={CONTAINER}>
             {/* Filter Row */}
             <div
@@ -172,14 +170,14 @@ export default function TreksPage() {
                 justifyContent: 'space-between',
                 marginBottom: '36px',
                 paddingBottom: '20px',
-                borderBottom: '1px solid rgba(255,255,255,0.08)'
+                borderBottom: '1px solid rgba(18, 22, 19, 0.08)'
               }}
             >
               <div>
-                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '24px', fontWeight: 800, color: '#FFFFFF', margin: '0 0 4px' }}>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '24px', fontWeight: 800, color: '#121613', margin: '0 0 4px' }}>
                   Explore Our 3 Signature Trails
                 </h2>
-                <p style={{ fontSize: '13px', color: '#8E9B92', margin: 0 }}>
+                <p style={{ fontSize: '13px', color: '#59655D', margin: 0 }}>
                   All packages include guide, accommodation, dinner, and breakfast
                 </p>
               </div>
@@ -200,9 +198,10 @@ export default function TreksPage() {
                         minHeight: '44px',
                         padding: '0 18px',
                         borderRadius: '999px',
-                        border: isCurrent ? '1px solid #D5ED55' : '1px solid rgba(255,255,255,0.14)',
-                        background: isCurrent ? '#D5ED55' : 'rgba(255,255,255,0.06)',
-                        color: isCurrent ? '#121613' : '#FFFFFF',
+                        border: isCurrent ? '1px solid #121613' : '1px solid rgba(18, 22, 19, 0.12)',
+                        background: isCurrent ? '#121613' : '#FFFFFF',
+                        color: isCurrent ? '#FFFFFF' : '#121613',
+                        boxShadow: isCurrent ? '0 4px 14px rgba(18, 22, 19, 0.12)' : '0 2px 6px rgba(18, 22, 19, 0.04)',
                         fontSize: '13px',
                         fontWeight: 800,
                         cursor: 'pointer',
@@ -223,47 +222,49 @@ export default function TreksPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: '28px' }}>
               {filteredTreks.map((trek) => {
                 const diffColor = trek.difficultyTone === 'easy'
-                  ? { bg: 'rgba(34, 197, 94, 0.16)', border: '#22C55E', text: '#22C55E' }
+                  ? { bg: 'rgba(22, 101, 52, 0.1)', border: '#166534', text: '#166534' }
                   : trek.difficultyTone === 'moderate'
-                  ? { bg: 'rgba(234, 179, 8, 0.16)', border: '#EAB308', text: '#FACC15' }
-                  : { bg: 'rgba(239, 68, 68, 0.16)', border: '#EF4444', text: '#F87171' };
+                  ? { bg: 'rgba(217, 119, 6, 0.1)', border: '#D97706', text: '#B45309' }
+                  : { bg: 'rgba(185, 28, 28, 0.1)', border: '#B91C1C', text: '#991B1B' };
 
                 return (
                   <article
                     key={trek.id}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.04)',
-                      border: '1px solid rgba(213, 237, 85, 0.22)',
+                      background: '#FFFFFF',
+                      border: '1px solid rgba(18, 22, 19, 0.09)',
                       borderRadius: '24px',
                       overflow: 'hidden',
                       display: 'flex',
                       flexDirection: 'column',
+                      boxShadow: '0 4px 20px rgba(18, 22, 19, 0.05)',
                       transition: 'transform 0.25s ease, box-shadow 0.25s ease'
                     }}
                     className="hover-lift"
                   >
                     {/* Image Header with Altitude & Duration Badges */}
-                    <div style={{ height: '230px', position: 'relative', overflow: 'hidden', background: '#0D1A10' }}>
+                    <div style={{ height: '230px', position: 'relative', overflow: 'hidden', background: '#121613' }}>
                       <Image
                         src={trek.image}
                         alt={trek.imageAlt}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        style={{ objectFit: 'cover', opacity: 0.9 }}
+                        style={{ objectFit: 'cover' }}
                         loading="lazy"
                       />
-                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.25) 0%, transparent 40%, rgba(0,0,0,0.85) 100%)' }} />
+                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 40%, rgba(0,0,0,0.65) 100%)' }} />
 
                       {/* Top Badges */}
                       <div style={{ position: 'absolute', top: '14px', left: '14px', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                         {trek.badge && (
                           <span
                             style={{
-                              background: trek.isProposed ? '#E5A93B' : '#D5ED55',
-                              color: '#121613',
+                              background: trek.isProposed ? '#FEF3C7' : '#1B4D3E',
+                              color: trek.isProposed ? '#92400E' : '#FFFFFF',
+                              border: trek.isProposed ? '1px solid rgba(146, 64, 14, 0.2)' : 'none',
                               fontSize: '10.5px',
                               fontWeight: 900,
-                              padding: '4px 10px',
+                              padding: '3px 9px',
                               borderRadius: '999px',
                               letterSpacing: '0.3px'
                             }}
@@ -273,20 +274,19 @@ export default function TreksPage() {
                         )}
                         <span
                           style={{
-                            background: 'rgba(0,0,0,0.65)',
-                            color: '#FFFFFF',
+                            background: '#FEF3C7',
+                            color: '#92400E',
+                            border: '1px solid rgba(146, 64, 14, 0.2)',
                             fontSize: '10.5px',
                             fontWeight: 800,
-                            padding: '4px 10px',
+                            padding: '3px 9px',
                             borderRadius: '999px',
-                            backdropFilter: 'blur(4px)',
-                            border: '1px solid rgba(255,255,255,0.15)',
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '4px'
                           }}
                         >
-                          <Mountain size={12} color="#D5ED55" />
+                          <Mountain size={11} color="#92400E" />
                           {trek.altitude}
                         </span>
                       </div>
@@ -310,7 +310,7 @@ export default function TreksPage() {
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '4px',
-                            background: 'rgba(18,22,19,0.88)',
+                            background: 'rgba(18,22,19,0.85)',
                             border: '1px solid rgba(255,255,255,0.16)',
                             padding: '3px 10px',
                             borderRadius: '999px',
@@ -320,7 +320,7 @@ export default function TreksPage() {
                             color: '#FFFFFF'
                           }}
                         >
-                          <MapPin size={11} color="#D5ED55" />
+                          <MapPin size={11} color="#FFFFFF" />
                           Starts: {trek.startingPoint}
                         </span>
 
@@ -329,40 +329,51 @@ export default function TreksPage() {
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '4px',
-                            background: 'rgba(18,22,19,0.88)',
+                            background: 'rgba(18,22,19,0.85)',
                             border: '1px solid rgba(255,255,255,0.16)',
                             padding: '3px 10px',
                             borderRadius: '999px',
                             backdropFilter: 'blur(6px)',
                             fontSize: '10.5px',
                             fontWeight: 800,
-                            color: '#D5ED55'
+                            color: '#FFFFFF'
                           }}
                         >
-                          <Clock size={11} color="#D5ED55" />
+                          <Clock size={11} color="#FFFFFF" />
                           {trek.duration}
                         </span>
                       </div>
                     </div>
 
-                    {/* Card Content */}
-                    <div style={{ padding: '22px 24px 24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                    {/* Card Content Body */}
+                    <div style={{ padding: '22px 22px 24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
                         <span
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '4px',
-                            background: 'rgba(213,237,85,0.14)',
-                            border: '1px solid rgba(213,237,85,0.35)',
-                            color: '#D5ED55',
-                            fontSize: '10.5px',
+                            background: 'rgba(27,77,62,0.08)',
+                            border: '1px solid rgba(27,77,62,0.22)',
+                            color: '#1B4D3E',
+                            fontSize: '10px',
                             fontWeight: 900,
-                            padding: '3px 9px',
+                            padding: '2px 8px',
                             borderRadius: '999px'
                           }}
                         >
-                          <Check size={9} color="#D5ED55" strokeWidth={3.5} />
+                          <span style={{
+                            width: '12px',
+                            height: '12px',
+                            borderRadius: '50%',
+                            background: '#1B4D3E',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            <Check size={8} color="#FFFFFF" strokeWidth={3.5} />
+                          </span>
                           Aanandham Mountain Marshal
                         </span>
 
@@ -376,7 +387,7 @@ export default function TreksPage() {
                             color: diffColor.text,
                             fontSize: '10.5px',
                             fontWeight: 800,
-                            padding: '3px 9px',
+                            padding: '2px 8px',
                             borderRadius: '999px'
                           }}
                         >
@@ -389,7 +400,7 @@ export default function TreksPage() {
                           fontFamily: 'var(--font-heading)',
                           fontSize: '22px',
                           fontWeight: 900,
-                          color: '#FFFFFF',
+                          color: '#121613',
                           margin: '0 0 4px',
                           lineHeight: 1.25,
                           letterSpacing: '-0.02em'
@@ -398,14 +409,14 @@ export default function TreksPage() {
                         {trek.name}
                       </h2>
 
-                      <div style={{ fontSize: '13px', fontWeight: 700, color: '#D5ED55', marginBottom: '10px' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 700, color: '#166534', marginBottom: '10px' }}>
                         {trek.tagline}
                       </div>
 
                       <p
                         style={{
                           fontSize: '13.5px',
-                          color: '#A2B6A6',
+                          color: '#4A554D',
                           lineHeight: 1.6,
                           margin: '0 0 18px'
                         }}
@@ -416,8 +427,8 @@ export default function TreksPage() {
                       {/* Package Inclusions Box */}
                       <div
                         style={{
-                          background: 'rgba(255,255,255,0.03)',
-                          border: '1px solid rgba(255,255,255,0.08)',
+                          background: '#F8F9F5',
+                          border: '1px solid rgba(18,22,19,0.08)',
                           borderRadius: '14px',
                           padding: '12px 14px',
                           marginBottom: '20px'
@@ -427,7 +438,7 @@ export default function TreksPage() {
                           style={{
                             fontSize: '10px',
                             fontWeight: 800,
-                            color: '#8E9B92',
+                            color: '#7D8880',
                             textTransform: 'uppercase',
                             letterSpacing: '0.6px',
                             marginBottom: '8px'
@@ -437,20 +448,20 @@ export default function TreksPage() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                           {trek.inclusions.map((inc, i) => (
-                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12.5px', color: '#E2E8E4', lineHeight: 1.35 }}>
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12.5px', color: '#121613', lineHeight: 1.35 }}>
                               <span
                                 style={{
                                   width: '15px',
                                   height: '15px',
                                   borderRadius: '50%',
-                                  background: 'rgba(213,237,85,0.15)',
+                                  background: 'rgba(27,77,62,0.1)',
                                   display: 'inline-flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
                                   flexShrink: 0
                                 }}
                               >
-                                <Check size={9} color="#D5ED55" strokeWidth={3} />
+                                <Check size={9} color="#166534" strokeWidth={3} />
                               </span>
                               <span>{inc}</span>
                             </div>
@@ -463,7 +474,7 @@ export default function TreksPage() {
                         style={{
                           marginTop: 'auto',
                           paddingTop: '16px',
-                          borderTop: '1px solid rgba(255,255,255,0.08)',
+                          borderTop: '1px solid rgba(18,22,19,0.08)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
@@ -472,12 +483,12 @@ export default function TreksPage() {
                         }}
                       >
                         <div>
-                          <div style={{ fontSize: '10px', fontWeight: 700, color: '#6B8A72', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          <div style={{ fontSize: '10px', fontWeight: 700, color: '#7D8880', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                             Trek Package Tariff
                           </div>
-                          <div style={{ fontFamily: 'var(--font-heading)', fontSize: '24px', fontWeight: 900, color: '#D5ED55', lineHeight: 1.1 }}>
+                          <div style={{ fontFamily: 'var(--font-heading)', fontSize: '24px', fontWeight: 900, color: '#121613', lineHeight: 1.1 }}>
                             {trek.priceFormatted}{' '}
-                            <span style={{ fontSize: '11px', fontWeight: 600, color: '#A2B6A6' }}>{trek.priceUnit}</span>
+                            <span style={{ fontSize: '11px', fontWeight: 600, color: '#59655D' }}>{trek.priceUnit}</span>
                           </div>
                         </div>
 
@@ -490,8 +501,8 @@ export default function TreksPage() {
                             minHeight: '44px',
                             padding: '0 20px',
                             borderRadius: '10px',
-                            background: '#D5ED55',
-                            color: '#121613',
+                            background: '#166534',
+                            color: '#FFFFFF',
                             fontSize: '13px',
                             fontWeight: 900,
                             textDecoration: 'none',
@@ -500,10 +511,11 @@ export default function TreksPage() {
                             justifyContent: 'center',
                             gap: '6px',
                             cursor: 'pointer',
+                            boxShadow: '0 2px 8px rgba(22, 101, 52, 0.25)',
                             transition: 'all 0.2s ease'
                           }}
                         >
-                          <WhatsAppIcon size={14} color="#121613" />
+                          <WhatsAppIcon size={14} color="#FFFFFF" />
                           <span>Book / Enquire</span>
                         </a>
                       </div>
@@ -516,32 +528,41 @@ export default function TreksPage() {
         </section>
 
         {/* ── BASECAMP ACCOMMODATION CALLOUT ── */}
-        <section style={{ padding: 'clamp(48px, 6vw, 72px) clamp(20px, 4vw, 48px)', background: '#0E1711', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <section style={{ padding: 'clamp(48px, 6vw, 72px) clamp(20px, 4vw, 48px)', background: '#FFFFFF', borderTop: '1px solid rgba(18, 22, 19, 0.08)' }}>
           <div style={CONTAINER}>
             <div
               style={{
-                background: 'linear-gradient(135deg, rgba(27,77,62,0.3) 0%, rgba(18,22,19,0.7) 100%)',
-                border: '1px solid rgba(213,237,85,0.25)',
+                background: '#F8F9F5',
+                border: '1px solid rgba(18, 22, 19, 0.09)',
                 borderRadius: '28px',
                 padding: 'clamp(32px, 5vw, 48px)',
                 display: 'flex',
                 flexWrap: 'wrap',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: '24px'
+                gap: '24px',
+                boxShadow: '0 8px 30px rgba(18, 22, 19, 0.04)'
               }}
             >
               <div style={{ maxWidth: '640px' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(213,237,85,0.14)', borderRadius: '999px', padding: '4px 12px', marginBottom: '12px' }}>
-                  <Sparkles size={12} color="#D5ED55" />
-                  <span style={{ fontSize: '10.5px', fontWeight: 900, color: '#D5ED55', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(27,77,62,0.08)', border: '1px solid rgba(27,77,62,0.2)', borderRadius: '999px', padding: '5px 14px', marginBottom: '14px' }}>
+                  <span style={{
+                    width: '7px',
+                    height: '7px',
+                    borderRadius: '50%',
+                    background: '#166534',
+                    boxShadow: '0 0 8px #166534',
+                    display: 'inline-block',
+                    animation: 'pulse-dot 1.8s ease-in-out infinite'
+                  }} />
+                  <span style={{ fontSize: '10.5px', fontWeight: 900, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
                     Trek Basecamp Homestay
                   </span>
                 </div>
-                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(24px, 3.2vw, 36px)', fontWeight: 900, color: '#FFFFFF', margin: '0 0 10px', lineHeight: 1.2 }}>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(24px, 3.2vw, 36px)', fontWeight: 900, color: '#121613', margin: '0 0 10px', lineHeight: 1.2 }}>
                   Need a Basecamp Before or After Your Trek?
                 </h2>
-                <p style={{ fontSize: '14.5px', color: '#A2B6A6', lineHeight: 1.65, margin: 0 }}>
+                <p style={{ fontSize: '14.5px', color: '#4A554D', lineHeight: 1.65, margin: 0 }}>
                   Stay right at the trailhead at <strong>The Nest Kalga</strong>. Backpacker dorm beds from ₹249/night, private sunrise balcony suites, clean hot water washrooms, and Pahadi Siddu dining overlooking snow peaks.
                 </p>
               </div>
@@ -553,8 +574,8 @@ export default function TreksPage() {
                     minHeight: '44px',
                     padding: '0 24px',
                     borderRadius: '999px',
-                    background: '#D5ED55',
-                    color: '#121613',
+                    background: '#121613',
+                    color: '#FFFFFF',
                     fontSize: '13.5px',
                     fontWeight: 900,
                     textDecoration: 'none',
@@ -576,16 +597,17 @@ export default function TreksPage() {
                     minHeight: '44px',
                     padding: '0 22px',
                     borderRadius: '999px',
-                    background: 'rgba(255,255,255,0.08)',
-                    border: '1px solid rgba(255,255,255,0.18)',
-                    color: '#FFFFFF',
+                    background: '#FFFFFF',
+                    border: '1px solid rgba(18,22,19,0.14)',
+                    color: '#121613',
                     fontSize: '13.5px',
                     fontWeight: 800,
                     textDecoration: 'none',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '6px'
+                    gap: '6px',
+                    boxShadow: '0 2px 6px rgba(18, 22, 19, 0.04)'
                   }}
                 >
                   <WhatsAppIcon size={14} color="#25D366" />
@@ -597,19 +619,19 @@ export default function TreksPage() {
         </section>
 
         {/* ── TREK PREPARATION & GUIDELINES ── */}
-        <section style={{ padding: 'clamp(48px, 6vw, 80px) clamp(20px, 4vw, 48px)', background: '#070D09' }}>
+        <section style={{ padding: 'clamp(48px, 6vw, 80px) clamp(20px, 4vw, 48px)', background: '#F8F9F5' }}>
           <div style={CONTAINER}>
             <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 40px' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(213,237,85,0.12)', borderRadius: '999px', padding: '4px 14px', marginBottom: '12px' }}>
-                <Info size={12} color="#D5ED55" />
-                <span style={{ fontSize: '10.5px', fontWeight: 900, color: '#D5ED55', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(27,77,62,0.08)', border: '1px solid rgba(27,77,62,0.2)', borderRadius: '999px', padding: '5px 14px', marginBottom: '14px' }}>
+                <Info size={12} color="#166534" />
+                <span style={{ fontSize: '10.5px', fontWeight: 900, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
                   Mountain Etiquette &amp; Gear
                 </span>
               </div>
-              <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(24px, 3.2vw, 36px)', fontWeight: 900, color: '#FFFFFF', margin: '0 0 10px' }}>
+              <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(24px, 3.2vw, 36px)', fontWeight: 900, color: '#121613', margin: '0 0 10px' }}>
                 Trail Advice from Our Mountain Marshals
               </h2>
-              <p style={{ fontSize: '14px', color: '#A2B6A6', lineHeight: 1.6, margin: 0 }}>
+              <p style={{ fontSize: '14px', color: '#4A554D', lineHeight: 1.6, margin: 0 }}>
                 Essential guidance to ensure a safe, joyful, and environmentally conscious journey in Parvati Valley.
               </p>
             </div>
@@ -644,16 +666,17 @@ export default function TreksPage() {
                 <div
                   key={idx}
                   style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    background: '#FFFFFF',
+                    border: '1px solid rgba(18,22,19,0.08)',
                     borderRadius: '18px',
-                    padding: '22px 20px'
+                    padding: '22px 20px',
+                    boxShadow: '0 2px 10px rgba(18, 22, 19, 0.04)'
                   }}
                 >
-                  <div style={{ fontFamily: 'var(--font-heading)', fontSize: '17px', fontWeight: 800, color: '#FFFFFF', marginBottom: '8px' }}>
+                  <div style={{ fontFamily: 'var(--font-heading)', fontSize: '17px', fontWeight: 800, color: '#121613', marginBottom: '8px' }}>
                     {tip.title}
                   </div>
-                  <p style={{ fontSize: '13px', color: '#A2B6A6', lineHeight: 1.6, margin: 0 }}>
+                  <p style={{ fontSize: '13px', color: '#4A554D', lineHeight: 1.6, margin: 0 }}>
                     {tip.desc}
                   </p>
                 </div>

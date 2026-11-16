@@ -242,11 +242,12 @@ export default function CampsDirectoryClient({
 
                 {/* ── HERO BANNER ── */}
                 <section style={{
-                    background: 'linear-gradient(180deg, #101E13 0%, #0D170F 100%)',
-                    color: '#FFFFFF',
-                    padding: 'clamp(115px, 12vw, 150px) clamp(20px, 4vw, 48px) clamp(44px, 6vw, 72px)',
+                    background: '#F8F9F5',
+                    color: '#121613',
+                    padding: 'clamp(115px, 12vw, 145px) clamp(20px, 4vw, 48px) clamp(44px, 6vw, 68px)',
                     position: 'relative',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    borderBottom: '1px solid rgba(18, 22, 19, 0.08)'
                 }}>
                     {/* Ambient Glow */}
                     <div style={{
@@ -256,7 +257,7 @@ export default function CampsDirectoryClient({
                         transform: 'translateX(-50%)',
                         width: '700px',
                         height: '350px',
-                        background: 'radial-gradient(circle, rgba(213, 237, 85, 0.12) 0%, rgba(16, 30, 19, 0) 70%)',
+                        background: 'radial-gradient(circle, rgba(27, 77, 62, 0.05) 0%, rgba(248, 249, 245, 0) 70%)',
                         pointerEvents: 'none',
                         filter: 'blur(60px)'
                     }} />
@@ -264,14 +265,34 @@ export default function CampsDirectoryClient({
                     <div style={{ maxWidth: '1440px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
                         <div style={{ maxWidth: '820px' }}>
                             {/* Visual Breadcrumb Navigation */}
-                            <nav aria-label="Breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#A2B6A6', marginBottom: '14px', flexWrap: 'wrap', fontWeight: '600' }}>
-                                <Link href="/" style={{ color: '#A2B6A6', textDecoration: 'none', transition: 'color 0.2s' }}>Home</Link>
-                                <span style={{ color: '#5A6E5F' }}>/</span>
-                                <span style={{ color: '#D5ED55', fontWeight: '700' }}>{comingSoonRegion ? `${comingSoonRegion} (Coming Soon)` : (selectedRegion !== 'All' ? `${selectedRegion} Camps` : 'Wilderness Campsites')}</span>
+                            <nav aria-label="Breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#59655D', marginBottom: '14px', flexWrap: 'wrap', fontWeight: '600' }}>
+                                <Link href="/" style={{ color: '#59655D', textDecoration: 'none', transition: 'color 0.2s' }}>Home</Link>
+                                <span style={{ color: 'rgba(18, 22, 19, 0.25)' }}>/</span>
+                                <span style={{ color: '#166534', fontWeight: '800' }}>{comingSoonRegion ? `${comingSoonRegion} (Coming Soon)` : (selectedRegion !== 'All' ? `${selectedRegion} Camps` : 'Wilderness Campsites')}</span>
                             </nav>
 
-                            <div className="star-badge" style={{ background: 'rgba(213, 237, 85, 0.15)', color: '#D5ED55', border: '1px solid rgba(213, 237, 85, 0.3)', marginBottom: '16px' }}>
-                                <span className="star-icon">★</span> {heroBadge || (isLoading ? 'VERIFIED CAMPSITES' : `${camps.length} VERIFIED CAMPSITES`)}
+                            <div style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                background: 'rgba(27, 77, 62, 0.08)',
+                                border: '1px solid rgba(27, 77, 62, 0.2)',
+                                borderRadius: '999px',
+                                padding: '5px 14px',
+                                marginBottom: '16px'
+                            }}>
+                                <span style={{
+                                    width: '7px',
+                                    height: '7px',
+                                    borderRadius: '50%',
+                                    background: '#166534',
+                                    boxShadow: '0 0 8px #166534',
+                                    display: 'inline-block',
+                                    animation: 'pulse-dot 1.8s ease-in-out infinite'
+                                }} />
+                                <span style={{ fontSize: '11px', fontWeight: '900', color: '#166534', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                                    {heroBadge || (isLoading ? 'VERIFIED HIGHLAND STAYS' : `${camps.length} VERIFIED HIGHLAND STAYS`)}
+                                </span>
                             </div>
                             
                             <h1 style={{
@@ -281,16 +302,16 @@ export default function CampsDirectoryClient({
                                 letterSpacing: '-0.035em',
                                 lineHeight: 1.15,
                                 margin: '0 0 16px',
-                                color: '#FFFFFF'
+                                color: '#121613'
                             }}>
                                 {heroTitle ? heroTitle : (
-                                    <>All India High-Altitude Camps & <span style={{ color: '#D5ED55' }}>Wilderness Basecamps</span></>
+                                    <>All India High-Altitude Camps & <span style={{ color: '#1B4D3E' }}>Wilderness Basecamps</span></>
                                 )}
                             </h1>
 
                             <p style={{
                                 fontSize: 'clamp(15px, 1.8vw, 17px)',
-                                color: '#A2B6A6',
+                                color: '#4A554D',
                                 lineHeight: 1.7,
                                 margin: '0 0 28px'
                             }}>
@@ -308,16 +329,17 @@ export default function CampsDirectoryClient({
                                             gap: '8px',
                                             padding: '10px 20px',
                                             borderRadius: '999px',
-                                            background: onlyWishlisted ? '#D5ED55' : 'rgba(255, 255, 255, 0.1)',
-                                            border: onlyWishlisted ? '1px solid #D5ED55' : '1px solid rgba(255, 255, 255, 0.2)',
-                                            color: onlyWishlisted ? '#121613' : '#FFFFFF',
+                                            background: onlyWishlisted ? '#121613' : '#FFFFFF',
+                                            border: onlyWishlisted ? '1px solid #121613' : '1px solid rgba(18, 22, 19, 0.14)',
+                                            color: onlyWishlisted ? '#FFFFFF' : '#121613',
+                                            boxShadow: onlyWishlisted ? '0 4px 14px rgba(18, 22, 19, 0.12)' : '0 2px 6px rgba(18, 22, 19, 0.04)',
                                             fontSize: '13.5px',
                                             fontWeight: '800',
                                             cursor: 'pointer',
                                             transition: 'all 0.2s ease'
                                         }}
                                     >
-                                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>{onlyWishlisted ? <Heart size={15} fill="#121613" /> : <Heart size={15} />} {onlyWishlisted ? 'Showing Wishlist Only' : `Saved Wishlist (${wishlist.length})`}</span>
+                                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>{onlyWishlisted ? <Heart size={15} fill="#FFFFFF" /> : <Heart size={15} color="#121613" />} {onlyWishlisted ? 'Showing Wishlist Only' : `Saved Wishlist (${wishlist.length})`}</span>
                                     </button>
                                 </div>
                             )}
@@ -411,9 +433,10 @@ export default function CampsDirectoryClient({
                                             style={{
                                                 padding: '8px 16px',
                                                 borderRadius: '999px',
-                                                background: isSelected ? '#121613' : '#F1F3EC',
-                                                color: isSelected ? '#D5ED55' : '#121613',
-                                                border: 'none',
+                                                background: isSelected ? '#121613' : '#FFFFFF',
+                                                color: isSelected ? '#FFFFFF' : '#121613',
+                                                border: isSelected ? '1px solid #121613' : '1px solid rgba(18, 22, 19, 0.12)',
+                                                boxShadow: isSelected ? '0 4px 14px rgba(18, 22, 19, 0.12)' : '0 2px 6px rgba(18, 22, 19, 0.04)',
                                                 fontSize: '12.5px',
                                                 fontWeight: '800',
                                                 cursor: 'pointer',
@@ -447,9 +470,10 @@ export default function CampsDirectoryClient({
                                             style={{
                                                 padding: '7px 14px',
                                                 borderRadius: '999px',
-                                                background: isSelected ? '#121613' : 'transparent',
-                                                color: isSelected ? '#D5ED55' : '#59655D',
+                                                background: isSelected ? '#121613' : '#FFFFFF',
+                                                color: isSelected ? '#FFFFFF' : '#4A554D',
                                                 border: isSelected ? '1px solid #121613' : '1px solid rgba(18, 22, 19, 0.12)',
+                                                boxShadow: isSelected ? '0 4px 14px rgba(18, 22, 19, 0.12)' : '0 2px 6px rgba(18, 22, 19, 0.04)',
                                                 fontSize: '12px',
                                                 fontWeight: '800',
                                                 cursor: 'pointer',
@@ -519,210 +543,198 @@ export default function CampsDirectoryClient({
                 )}
 
                 {/* ── AANANDHAM.STAYS LAUNCH BANNER ── */}
-                <section style={{ maxWidth: '1440px', margin: '0 auto 0', padding: '0 clamp(20px, 4vw, 48px)' }}>
+                <section style={{ maxWidth: '1440px', margin: '0 auto 40px', padding: '0 clamp(20px, 4vw, 48px)' }}>
                     <div style={{
-                        background: 'linear-gradient(135deg, #0B1A0E 0%, #121E15 50%, #0D1A10 100%)',
-                        borderRadius: '28px 28px 0 0',
-                        padding: 'clamp(28px, 4vw, 44px) clamp(24px, 4vw, 52px) clamp(24px, 3vw, 36px)',
+                        background: '#FFFFFF',
+                        borderRadius: '24px',
+                        padding: 'clamp(28px, 4vw, 40px) clamp(24px, 4vw, 48px)',
                         position: 'relative',
                         overflow: 'hidden',
-                        border: '1px solid rgba(213, 237, 85, 0.18)',
-                        borderBottom: 'none',
-                        boxShadow: '0 20px 60px rgba(0,0,0,0.25)'
+                        border: '1px solid rgba(18, 22, 19, 0.08)',
+                        boxShadow: '0 8px 30px rgba(18, 22, 19, 0.04)'
                     }}>
-                        {/* Glow blur */}
-                        <div style={{ position: 'absolute', top: '-80px', right: '-80px', width: '380px', height: '280px', background: 'radial-gradient(circle, rgba(213,237,85,0.14) 0%, transparent 70%)', filter: 'blur(60px)', pointerEvents: 'none' }} />
-                        <div style={{ position: 'absolute', bottom: '-60px', left: '10%', width: '300px', height: '200px', background: 'radial-gradient(circle, rgba(37,211,102,0.08) 0%, transparent 70%)', filter: 'blur(50px)', pointerEvents: 'none' }} />
+                        {/* Highland Ambient Glow */}
+                        <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '380px', height: '280px', background: 'radial-gradient(circle, rgba(27, 77, 62, 0.04) 0%, transparent 70%)', filter: 'blur(50px)', pointerEvents: 'none' }} />
+                        <div style={{ position: 'absolute', bottom: '-40px', left: '10%', width: '300px', height: '200px', background: 'radial-gradient(circle, rgba(217, 119, 6, 0.03) 0%, transparent 70%)', filter: 'blur(40px)', pointerEvents: 'none' }} />
 
                         <div style={{ position: 'relative', zIndex: 2 }}>
                             {/* Header row */}
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '28px' }}>
                                 <div style={{ flex: 1, minWidth: '260px' }}>
-                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(213,237,85,0.12)', border: '1px solid rgba(213,237,85,0.3)', borderRadius: '999px', padding: '5px 14px', marginBottom: '14px' }}>
-                                        <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#D5ED55', boxShadow: '0 0 8px #D5ED55', display: 'inline-block', animation: 'pulse-dot 1.8s ease-in-out infinite' }} />
-                                        <span style={{ fontSize: '11px', fontWeight: '900', color: '#D5ED55', letterSpacing: '1px', textTransform: 'uppercase' }}>Now Open · Aanandham.Stays</span>
+                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(27, 77, 62, 0.08)', border: '1px solid rgba(27, 77, 62, 0.2)', borderRadius: '999px', padding: '5px 14px', marginBottom: '14px' }}>
+                                        <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#166534', boxShadow: '0 0 8px #166534', display: 'inline-block', animation: 'pulse-dot 1.8s ease-in-out infinite' }} />
+                                        <span style={{ fontSize: '11px', fontWeight: '900', color: '#166534', letterSpacing: '1px', textTransform: 'uppercase' }}>Now Open · Aanandham.Stays</span>
                                     </div>
-                                    <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(22px, 3.5vw, 34px)', fontWeight: '900', color: '#FFFFFF', margin: '0 0 10px', letterSpacing: '-0.03em', lineHeight: 1.2 }}>
-                                        Stays by Aanandham
-                                        <span style={{ color: '#D5ED55' }}>.Stays</span>
+                                    <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(24px, 3.5vw, 36px)', fontWeight: '900', color: '#121613', margin: '0 0 10px', letterSpacing: '-0.03em', lineHeight: 1.2 }}>
+                                        Stays by Aanandham<span style={{ color: '#1B4D3E' }}>.Stays</span>
                                     </h2>
-                                    <p style={{ fontSize: 'clamp(13px, 1.4vw, 15px)', color: '#A2B6A6', lineHeight: 1.65, margin: 0, maxWidth: '560px' }}>
+                                    <p style={{ fontSize: 'clamp(14px, 1.4vw, 15px)', color: '#4A554D', lineHeight: 1.65, margin: 0, maxWidth: '580px' }}>
                                         Owner-operated, personally verified mountain stays. Every detail handpicked by our team — from Himalayan sunrises to campfire dinners.
                                     </p>
                                 </div>
                                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignSelf: 'center' }}>
-                                    <a href="https://wa.me/919074858014?text=Hi! I want to know more about Aanandham.Stays" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', background: 'rgba(255,255,255,0.07)', color: '#FFFFFF', fontWeight: '800', fontSize: '13px', padding: '10px 20px', borderRadius: '12px', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.15)' }}>
+                                    <a href="https://wa.me/919074858014?text=Hi!%20I%20want%20to%20know%20more%20about%20Aanandham.Stays" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', background: '#FFFFFF', color: '#121613', fontWeight: '800', fontSize: '13px', padding: '10px 20px', borderRadius: '999px', textDecoration: 'none', border: '1px solid rgba(18, 22, 19, 0.14)', boxShadow: '0 2px 6px rgba(18, 22, 19, 0.04)' }}>
                                         Enquire on WhatsApp →
                                     </a>
                                 </div>
                             </div>
 
                             {/* ── TWO FEATURED PROPERTY CARDS ── */}
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '16px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '20px' }}>
 
                                 {/* — Card 1: The Nest Kalga (LIVE FROM PMS) — */}
                                 <div
                                     onClick={() => router.push('/camps/the-nest-kalga')}
-                                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(213,237,85,0.22)', borderRadius: '20px', overflow: 'hidden', cursor: 'pointer', transition: 'transform 0.2s ease, box-shadow 0.2s ease', position: 'relative' }}
-                                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.4)'; }}
+                                    style={{ background: '#F8F9F5', border: '1px solid rgba(18, 22, 19, 0.09)', borderRadius: '20px', overflow: 'hidden', cursor: 'pointer', transition: 'transform 0.2s ease, box-shadow 0.2s ease', position: 'relative' }}
+                                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(18, 22, 19, 0.08)'; }}
                                     onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
                                 >
-                                    {/* Image — No stock image fallback when real photos not uploaded */}
-                                    <div style={{ height: '200px', position: 'relative', overflow: 'hidden', background: 'radial-gradient(circle at 50% 40%, #162419 0%, #0A130C 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                        <Mountain size={38} color="#D5ED55" strokeWidth={1.5} style={{ opacity: 0.85 }} />
-                                        <span style={{ fontSize: '11px', fontWeight: '800', color: '#D5ED55', letterSpacing: '0.5px', textTransform: 'uppercase' }}>8,000 FT Alpine Sanctuary</span>
-                                        <span style={{ fontSize: '10px', color: '#6B8A72', fontWeight: '600' }}>Live Photos Being Verified</span>
+                                    <div style={{ height: '200px', position: 'relative', overflow: 'hidden', background: '#121613', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                        <Mountain size={38} color="#1B4D3E" strokeWidth={1.5} style={{ opacity: 0.85 }} />
+                                        <span style={{ fontSize: '11px', fontWeight: '800', color: '#FFFFFF', letterSpacing: '0.5px', textTransform: 'uppercase' }}>8,000 FT Alpine Sanctuary</span>
+                                        <span style={{ fontSize: '10px', color: '#A3B1A7', fontWeight: '600' }}>Live Photos Being Verified</span>
                                         {/* Top badges */}
                                         <div style={{ position: 'absolute', top: '12px', left: '12px', display: 'flex', gap: '6px' }}>
-                                            <span style={{ background: '#D5ED55', color: '#121613', fontSize: '10px', fontWeight: '900', padding: '4px 10px', borderRadius: '999px' }}>Cottages &amp; Cabins</span>
-                                            <span style={{ background: '#E5A93B', color: '#121613', fontSize: '10px', fontWeight: '800', padding: '4px 10px', borderRadius: '999px' }}>8,000 FT</span>
+                                            <span style={{ background: '#1B4D3E', color: '#FFFFFF', fontSize: '10px', fontWeight: '900', padding: '3px 8px', borderRadius: '999px' }}>Cottages &amp; Cabins</span>
+                                            <span style={{ background: '#FEF3C7', color: '#92400E', border: '1px solid rgba(146, 64, 14, 0.2)', fontSize: '10px', fontWeight: '800', padding: '3px 8px', borderRadius: '999px' }}>8,000 FT</span>
                                         </div>
                                         {/* Live dot bottom-right */}
-                                        <div style={{ position: 'absolute', bottom: '12px', right: '12px', display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(22,101,52,0.9)', border: '1px solid #166534', padding: '4px 10px', borderRadius: '999px', backdropFilter: 'blur(6px)' }}>
+                                        <div style={{ position: 'absolute', bottom: '12px', right: '12px', display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(22,101,52,0.95)', border: '1px solid #166534', padding: '4px 10px', borderRadius: '999px', backdropFilter: 'blur(6px)' }}>
                                             <span className="live-available-dot" />
                                             <span style={{ fontSize: '10.5px', fontWeight: '800', color: '#FFFFFF' }}>Live Available</span>
                                         </div>
                                     </div>
                                     {/* Body */}
-                                    <div style={{ padding: '18px 20px 20px' }}>
+                                    <div style={{ padding: '20px 22px 22px' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
                                             <span style={{
                                                 display: 'inline-flex',
                                                 alignItems: 'center',
-                                                gap: '4.5px',
-                                                background: 'rgba(213,237,85,0.12)',
-                                                border: '1px solid rgba(213,237,85,0.3)',
-                                                color: '#D5ED55',
+                                                gap: '4px',
+                                                background: 'rgba(27, 77, 62, 0.08)',
+                                                border: '1px solid rgba(27, 77, 62, 0.22)',
+                                                color: '#1B4D3E',
                                                 fontSize: '10px',
                                                 fontWeight: '900',
-                                                padding: '3px 9px',
+                                                padding: '2px 8px',
                                                 borderRadius: '999px'
                                             }}>
                                                 <span style={{
                                                     width: '12px',
                                                     height: '12px',
                                                     borderRadius: '50%',
-                                                    background: '#D5ED55',
+                                                    background: '#1B4D3E',
                                                     display: 'inline-flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
                                                     flexShrink: 0
                                                 }}>
-                                                    <Check size={8} color="#121613" strokeWidth={3.5} />
+                                                    <Check size={8} color="#FFFFFF" strokeWidth={3.5} />
                                                 </span>
                                                 by Aanandham.Stays
                                             </span>
-                                            <span style={{ fontSize: '10.5px', color: '#6B8A72', fontWeight: '600' }}>Kasol, Himachal</span>
+                                            <span style={{ fontSize: '11px', color: '#59655D', fontWeight: '700' }}>Kasol, Himachal</span>
                                         </div>
-                                        <div style={{ fontSize: 'clamp(16px, 2vw, 18px)', fontWeight: '900', color: '#FFFFFF', marginBottom: '6px', lineHeight: 1.3 }}>The Nest Kalga by Aanandham.Go</div>
-                                        <div style={{ fontSize: '12.5px', color: '#A2B6A6', lineHeight: 1.5, marginBottom: '14px' }}>Solar-powered mountain basecamp with panoramic sunrise deck, 10-bed dorm, private balcony rooms &amp; guided ridge treks.</div>
+                                        <div style={{ fontSize: 'clamp(17px, 2vw, 19px)', fontWeight: '800', color: '#121613', marginBottom: '6px', lineHeight: 1.3, fontFamily: 'var(--font-heading)' }}>The Nest Kalga by Aanandham.Go</div>
+                                        <div style={{ fontSize: '13px', color: '#4A554D', lineHeight: 1.55, marginBottom: '14px' }}>Solar-powered mountain basecamp with panoramic sunrise deck, 10-bed dorm, private balcony rooms &amp; guided ridge treks.</div>
                                         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '16px' }}>
                                             {['Sunrise Deck', 'Campfire & BBQ', 'Guided Trek', 'Solar Powered'].map((f, i) => (
-                                                <span key={i} style={{ fontSize: '10.5px', fontWeight: '700', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#D5ED55', padding: '3px 9px', borderRadius: '6px' }}>✓ {f}</span>
+                                                <span key={i} style={{ fontSize: '11px', fontWeight: '700', background: '#FFFFFF', border: '1px solid rgba(18, 22, 19, 0.08)', color: '#166534', padding: '3px 9px', borderRadius: '6px' }}>✓ {f}</span>
                                             ))}
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', borderTop: '1px solid rgba(18, 22, 19, 0.08)', paddingTop: '14px' }}>
                                             <div>
-                                                <div style={{ fontSize: '9.5px', fontWeight: '700', color: '#6B8A72', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Starts at</div>
-                                                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '22px', fontWeight: '900', color: '#D5ED55', lineHeight: 1 }}>₹249 <span style={{ fontSize: '11px', fontWeight: '600', color: '#A2B6A6' }}>/ bed / night</span></div>
+                                                <div style={{ fontSize: '9.5px', fontWeight: '800', color: '#7D8880', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Starts at</div>
+                                                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '22px', fontWeight: '900', color: '#121613', lineHeight: 1 }}>₹249 <span style={{ fontSize: '11px', fontWeight: '600', color: '#59655D' }}>/ bed</span></div>
                                             </div>
                                             <div style={{ display: 'flex', gap: '8px' }}>
-                                                <button onClick={e => { e.stopPropagation(); router.push('/camps/the-nest-kalga'); }} style={{ padding: '9px 16px', borderRadius: '10px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)', color: '#FFFFFF', fontSize: '12px', fontWeight: '800', cursor: 'pointer' }}>Details →</button>
-                                                <button onClick={e => { e.stopPropagation(); const kalgaCamp = camps.find(c => (c.id === 'the-nest-kalga' || c.id === 'cmu7f7c7q0001jf2bn12igi66' || c.slug === 'the-nest-kalga')); if (kalgaCamp) { setSelectedPackageForBooking(kalgaCamp); setIsBookingModalOpen(true); } }} style={{ padding: '9px 16px', borderRadius: '10px', background: '#D5ED55', border: 'none', color: '#121613', fontSize: '12px', fontWeight: '900', cursor: 'pointer' }}>Book Now</button>
+                                                <button onClick={e => { e.stopPropagation(); router.push('/camps/the-nest-kalga'); }} style={{ padding: '9px 16px', borderRadius: '10px', background: '#FFFFFF', border: '1px solid rgba(18, 22, 19, 0.12)', color: '#121613', fontSize: '12px', fontWeight: '800', cursor: 'pointer' }}>Details →</button>
+                                                <button onClick={e => { e.stopPropagation(); const kalgaCamp = camps.find(c => c.id === 'the-nest-kalga' || c.id === 'cmu7f7c7q0001jf2bn12igi66' || c.slug === 'the-nest-kalga'); if (kalgaCamp) { setSelectedPackageForBooking(kalgaCamp); setIsBookingModalOpen(true); } else { router.push('/camps/the-nest-kalga'); } }} style={{ padding: '9px 16px', borderRadius: '10px', background: '#121613', border: 'none', color: '#FFFFFF', fontSize: '12px', fontWeight: '900', cursor: 'pointer' }}>Book Now</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* — Card 2: Kolukkumalai Teddy's (LIVE IN MUNNAR) — */}
+                                {/* — Card 2: Kolukkumalai Teddy's Domes — */}
                                 <div
                                     onClick={() => router.push('/camps/pkg-kolukkumalai-teddy-domes')}
-                                    style={{
-                                        background: 'rgba(255,255,255,0.04)',
-                                        border: '1px solid rgba(213,237,85,0.22)',
-                                        borderRadius: '20px',
-                                        overflow: 'hidden',
-                                        cursor: 'pointer',
-                                        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                                        position: 'relative'
-                                    }}
-                                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.4)'; }}
+                                    style={{ background: '#F8F9F5', border: '1px solid rgba(18, 22, 19, 0.09)', borderRadius: '20px', overflow: 'hidden', cursor: 'pointer', transition: 'transform 0.2s ease, box-shadow 0.2s ease', position: 'relative' }}
+                                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(18, 22, 19, 0.08)'; }}
                                     onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
                                 >
-                                    {/* Image */}
-                                    <div style={{ height: '200px', position: 'relative', overflow: 'hidden', background: '#0D1A10' }}>
-                                        <img
-                                            src="/images/teddy/teddy-dome-1.jpg"
-                                            alt="Kolukkumalai Teddy's Campsite"
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.88 }}
-                                            loading="lazy"
+                                    <div style={{ height: '200px', position: 'relative', overflow: 'hidden' }}>
+                                        <AssetImage
+                                            src="/camps/teddys-tent-camp-kolukkumalai.webp"
+                                            alt="Kolukkumalai Teddy's Campsite geodesic domes overlooking Suryanelli clouds"
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, 400px"
                                         />
-                                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 40%, rgba(0,0,0,0.7) 100%)' }} />
+                                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 40%, rgba(0,0,0,0.65) 100%)' }} />
                                         {/* Top badges */}
                                         <div style={{ position: 'absolute', top: '12px', left: '12px', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                                            <span style={{ background: '#D5ED55', color: '#121613', fontSize: '10px', fontWeight: '900', padding: '4px 10px', borderRadius: '999px' }}>Sky Deck &amp; Domes</span>
-                                            <span style={{ background: '#E5A93B', color: '#121613', fontSize: '10px', fontWeight: '800', padding: '4px 10px', borderRadius: '999px' }}>7,100 FT</span>
+                                            <span style={{ background: '#1B4D3E', color: '#FFFFFF', fontSize: '10px', fontWeight: '900', padding: '3px 8px', borderRadius: '999px' }}>Sky Deck &amp; Domes</span>
+                                            <span style={{ background: '#FEF3C7', color: '#92400E', border: '1px solid rgba(146, 64, 14, 0.2)', fontSize: '10px', fontWeight: '800', padding: '3px 8px', borderRadius: '999px' }}>7,100 FT</span>
                                         </div>
                                         {/* Live dot bottom-right */}
-                                        <div style={{ position: 'absolute', bottom: '12px', right: '12px', display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(22,101,52,0.9)', border: '1px solid #166534', padding: '4px 10px', borderRadius: '999px', backdropFilter: 'blur(6px)' }}>
+                                        <div style={{ position: 'absolute', bottom: '12px', right: '12px', display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(22,101,52,0.95)', border: '1px solid #166534', padding: '4px 10px', borderRadius: '999px', backdropFilter: 'blur(6px)' }}>
                                             <span className="live-available-dot" />
                                             <span style={{ fontSize: '10.5px', fontWeight: '800', color: '#FFFFFF' }}>Live Available</span>
                                         </div>
                                     </div>
                                     {/* Body */}
-                                    <div style={{ padding: '18px 20px 20px' }}>
+                                    <div style={{ padding: '20px 22px 22px' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
                                             <span style={{
                                                 display: 'inline-flex',
                                                 alignItems: 'center',
-                                                gap: '4.5px',
-                                                background: 'rgba(213,237,85,0.12)',
-                                                border: '1px solid rgba(213,237,85,0.3)',
-                                                color: '#D5ED55',
+                                                gap: '4px',
+                                                background: 'rgba(27, 77, 62, 0.08)',
+                                                border: '1px solid rgba(27, 77, 62, 0.22)',
+                                                color: '#1B4D3E',
                                                 fontSize: '10px',
                                                 fontWeight: '900',
-                                                padding: '3px 9px',
+                                                padding: '2px 8px',
                                                 borderRadius: '999px'
                                             }}>
                                                 <span style={{
                                                     width: '12px',
                                                     height: '12px',
                                                     borderRadius: '50%',
-                                                    background: '#D5ED55',
+                                                    background: '#1B4D3E',
                                                     display: 'inline-flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
                                                     flexShrink: 0
                                                 }}>
-                                                    <Check size={8} color="#121613" strokeWidth={3.5} />
+                                                    <Check size={8} color="#FFFFFF" strokeWidth={3.5} />
                                                 </span>
                                                 by Aanandham.Stays
                                             </span>
-                                            <span style={{ fontSize: '10.5px', color: '#6B8A72', fontWeight: '600' }}>Suryanelli / Kolukkumalai, Munnar</span>
+                                            <span style={{ fontSize: '11px', color: '#59655D', fontWeight: '700' }}>Suryanelli / Kolukkumalai, Munnar</span>
                                         </div>
-                                        <div style={{ fontSize: 'clamp(16px, 2vw, 18px)', fontWeight: '900', color: '#FFFFFF', marginBottom: '6px', lineHeight: 1.3 }}>Kolukkumalai Teddy's Campsite — Sky Deck &amp; Kolukkumalai Sunrise</div>
-                                        <div style={{ fontSize: '12.5px', color: '#A2B6A6', lineHeight: 1.5, marginBottom: '14px' }}>Sky deck &amp; geodesic dome sanctuary overlooking Suryanelli tea valleys with 4x4 sunrise safari to Kolukkumalai summit.</div>
+                                        <div style={{ fontSize: 'clamp(17px, 2vw, 19px)', fontWeight: '800', color: '#121613', marginBottom: '6px', lineHeight: 1.3, fontFamily: 'var(--font-heading)' }}>Kolukkumalai Teddy's Campsite — Sky Deck &amp; Kolukkumalai Sunrise</div>
+                                        <div style={{ fontSize: '13px', color: '#4A554D', lineHeight: 1.55, marginBottom: '14px' }}>Sky deck &amp; geodesic dome sanctuary overlooking Suryanelli tea valleys with 4x4 sunrise safari to Kolukkumalai summit.</div>
                                         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '16px' }}>
                                             {['4x4 Sunrise Safari', 'Sky Deck & Domes', 'Campfire & BBQ', 'Sunset Ridge Trek'].map((f, i) => (
-                                                <span key={i} style={{ fontSize: '10.5px', fontWeight: '700', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#D5ED55', padding: '3px 9px', borderRadius: '6px' }}>✓ {f}</span>
+                                                <span key={i} style={{ fontSize: '11px', fontWeight: '700', background: '#FFFFFF', border: '1px solid rgba(18, 22, 19, 0.08)', color: '#166534', padding: '3px 9px', borderRadius: '6px' }}>✓ {f}</span>
                                             ))}
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', borderTop: '1px solid rgba(18, 22, 19, 0.08)', paddingTop: '14px' }}>
                                             <div>
-                                                <div style={{ fontSize: '9.5px', fontWeight: '700', color: '#6B8A72', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Starts at</div>
-                                                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '22px', fontWeight: '900', color: '#D5ED55', lineHeight: 1 }}>₹2,299 <span style={{ fontSize: '11px', fontWeight: '600', color: '#A2B6A6' }}>/ camper</span></div>
+                                                <div style={{ fontSize: '9.5px', fontWeight: '800', color: '#7D8880', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Starts at</div>
+                                                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '22px', fontWeight: '900', color: '#121613', lineHeight: 1 }}>₹2,299 <span style={{ fontSize: '11px', fontWeight: '600', color: '#59655D' }}>/ camper</span></div>
                                             </div>
                                             <div style={{ display: 'flex', gap: '8px' }}>
-                                                <button onClick={e => { e.stopPropagation(); router.push('/camps/pkg-kolukkumalai-teddy-domes'); }} style={{ padding: '9px 16px', borderRadius: '10px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)', color: '#FFFFFF', fontSize: '12px', fontWeight: '800', cursor: 'pointer' }}>Details →</button>
-                                                <button onClick={e => { e.stopPropagation(); const teddyCamp = camps.find(c => c.id === 'pkg-kolukkumalai-teddy-domes' || c.id?.includes('teddy')); if (teddyCamp) { setSelectedPackageForBooking(teddyCamp); setIsBookingModalOpen(true); } else { router.push('/camps/pkg-kolukkumalai-teddy-domes'); } }} style={{ padding: '9px 16px', borderRadius: '10px', background: '#D5ED55', border: 'none', color: '#121613', fontSize: '12px', fontWeight: '900', cursor: 'pointer' }}>Book Now</button>
+                                                <button onClick={e => { e.stopPropagation(); router.push('/camps/pkg-kolukkumalai-teddy-domes'); }} style={{ padding: '9px 16px', borderRadius: '10px', background: '#FFFFFF', border: '1px solid rgba(18, 22, 19, 0.12)', color: '#121613', fontSize: '12px', fontWeight: '800', cursor: 'pointer' }}>Details →</button>
+                                                <button onClick={e => { e.stopPropagation(); const teddyCamp = camps.find(c => c.id === 'pkg-kolukkumalai-teddy-domes' || c.id?.includes('teddy')); if (teddyCamp) { setSelectedPackageForBooking(teddyCamp); setIsBookingModalOpen(true); } else { router.push('/camps/pkg-kolukkumalai-teddy-domes'); } }} style={{ padding: '9px 16px', borderRadius: '10px', background: '#121613', border: 'none', color: '#FFFFFF', fontSize: '12px', fontWeight: '900', cursor: 'pointer' }}>Book Now</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
                 {/* ── CAMPSITES LISTING GRID ── */}
                 <section id="aanandham-stays-section" style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 clamp(20px, 4vw, 48px)', scrollMarginTop: '90px' }}>
@@ -1022,28 +1034,26 @@ export default function CampsDirectoryClient({
                                                         <span style={{
                                                             display: 'inline-flex',
                                                             alignItems: 'center',
-                                                            gap: '4.5px',
-                                                            background: 'linear-gradient(135deg, #0B1A0E 0%, #121E15 100%)',
-                                                            color: '#D5ED55',
+                                                            gap: '4px',
+                                                            background: 'rgba(27, 77, 62, 0.08)',
+                                                            border: '1px solid rgba(27, 77, 62, 0.22)',
+                                                            color: '#1B4D3E',
                                                             fontSize: '10px',
                                                             fontWeight: '900',
-                                                            padding: '3px 9px',
-                                                            borderRadius: '999px',
-                                                            border: '1px solid rgba(213,237,85,0.35)',
-                                                            letterSpacing: '0.2px',
-                                                            boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                                                            padding: '2px 8px',
+                                                            borderRadius: '999px'
                                                         }}>
                                                             <span style={{
                                                                 width: '12px',
                                                                 height: '12px',
                                                                 borderRadius: '50%',
-                                                                background: '#D5ED55',
+                                                                background: '#1B4D3E',
                                                                 display: 'inline-flex',
                                                                 alignItems: 'center',
                                                                 justifyContent: 'center',
                                                                 flexShrink: 0
                                                             }}>
-                                                                <Check size={8} color="#121613" strokeWidth={3.5} />
+                                                                <Check size={8} color="#FFFFFF" strokeWidth={3.5} />
                                                             </span>
                                                             by Aanandham.Stays
                                                         </span>
@@ -1051,28 +1061,26 @@ export default function CampsDirectoryClient({
                                                         <span style={{
                                                             display: 'inline-flex',
                                                             alignItems: 'center',
-                                                            gap: '4.5px',
-                                                            background: '#121613',
-                                                            color: '#D5ED55',
+                                                            gap: '4px',
+                                                            background: 'rgba(18, 22, 19, 0.06)',
+                                                            border: '1px solid rgba(18, 22, 19, 0.12)',
+                                                            color: '#121613',
                                                             fontSize: '10px',
-                                                            fontWeight: '900',
-                                                            padding: '3px 9px',
-                                                            borderRadius: '999px',
-                                                            border: '1px solid rgba(213,237,85,0.25)',
-                                                            letterSpacing: '0.2px',
-                                                            boxShadow: '0 2px 6px rgba(0,0,0,0.18)'
+                                                            fontWeight: '800',
+                                                            padding: '2px 8px',
+                                                            borderRadius: '999px'
                                                         }}>
                                                             <span style={{
                                                                 width: '12px',
                                                                 height: '12px',
                                                                 borderRadius: '50%',
-                                                                background: '#D5ED55',
+                                                                background: '#166534',
                                                                 display: 'inline-flex',
                                                                 alignItems: 'center',
                                                                 justifyContent: 'center',
                                                                 flexShrink: 0
                                                             }}>
-                                                                <Check size={8} color="#121613" strokeWidth={3.5} />
+                                                                <Check size={8} color="#FFFFFF" strokeWidth={3.5} />
                                                             </span>
                                                             Verified
                                                         </span>
@@ -1204,16 +1212,36 @@ export default function CampsDirectoryClient({
                 </section>
 
                 {/* ── ACCOMMODATION STYLES PER-TYPE GALLERY BREAKDOWN ── */}
-                <section style={{ maxWidth: '1440px', margin: '100px auto 0', padding: '0 clamp(20px, 4vw, 48px)' }}>
-                    <div style={{ background: '#101E13', borderRadius: '32px', padding: 'clamp(40px, 6vw, 70px) clamp(24px, 4vw, 60px)', color: '#FFFFFF' }}>
-                        <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 48px' }}>
-                            <div className="star-badge" style={{ background: 'rgba(213, 237, 85, 0.15)', color: '#D5ED55', border: '1px solid rgba(213, 237, 85, 0.3)', margin: '0 auto 12px' }}>
-                                <span className="star-icon">★</span> ACCOMMODATION TYPES
+                <section style={{ maxWidth: '1440px', margin: '80px auto 0', padding: '0 clamp(20px, 4vw, 48px)' }}>
+                    <div style={{ background: '#FFFFFF', borderRadius: '32px', padding: 'clamp(40px, 6vw, 64px) clamp(24px, 4vw, 56px)', color: '#121613', border: '1px solid rgba(18, 22, 19, 0.08)', boxShadow: '0 8px 30px rgba(18, 22, 19, 0.04)' }}>
+                        <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 44px' }}>
+                            <div style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                background: 'rgba(27, 77, 62, 0.08)',
+                                border: '1px solid rgba(27, 77, 62, 0.2)',
+                                borderRadius: '999px',
+                                padding: '5px 14px',
+                                marginBottom: '14px'
+                            }}>
+                                <span style={{
+                                    width: '7px',
+                                    height: '7px',
+                                    borderRadius: '50%',
+                                    background: '#166534',
+                                    boxShadow: '0 0 8px #166534',
+                                    display: 'inline-block',
+                                    animation: 'pulse-dot 1.8s ease-in-out infinite'
+                                }} />
+                                <span style={{ fontSize: '11px', fontWeight: '900', color: '#166534', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                                    ACCOMMODATION TYPES · HIGHLAND COLLECTION
+                                </span>
                             </div>
-                            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: '800', color: '#FFFFFF', margin: '0 0 12px' }}>
+                            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: '800', color: '#121613', margin: '0 0 12px' }}>
                                 Experience Wilderness With Luxury Rest
                             </h2>
-                            <p style={{ fontSize: '15px', color: '#A2B6A6', margin: 0, lineHeight: 1.65 }}>
+                            <p style={{ fontSize: '15px', color: '#4A554D', margin: 0, lineHeight: 1.65 }}>
                                 Every campsite includes clean western washrooms, running hot water, 24/7 power backup, and dedicated basecamp coordinators.
                             </p>
                         </div>
@@ -1242,23 +1270,23 @@ export default function CampsDirectoryClient({
                                     features: ['Timber Balcony Deck', 'Queen Plush Bed', 'En-suite Restroom', '24/7 Hot Water Facility']
                                 }
                             ].map((pod, pidx) => (
-                                <div key={pidx} style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                                <div key={pidx} style={{ background: '#F8F9F5', border: '1px solid rgba(18, 22, 19, 0.09)', borderRadius: '24px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                                     <div style={{ height: '200px', position: 'relative' }}>
-                                        <img src={pod.img} alt={pod.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }}  loading="lazy" decoding="async"/>
-                                        <span style={{ position: 'absolute', top: '14px', left: '14px', background: '#D5ED55', color: '#121613', fontSize: '11px', fontWeight: '800', padding: '4px 10px', borderRadius: '999px' }}>
+                                        <img src={pod.img} alt={pod.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" decoding="async"/>
+                                        <span style={{ position: 'absolute', top: '14px', left: '14px', background: '#1B4D3E', color: '#FFFFFF', fontSize: '10.5px', fontWeight: '800', padding: '4px 10px', borderRadius: '999px' }}>
                                             {pod.badge}
                                         </span>
                                     </div>
                                     <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '20px', fontWeight: '800', color: '#FFFFFF', margin: '0 0 8px' }}>
+                                        <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '20px', fontWeight: '800', color: '#121613', margin: '0 0 8px' }}>
                                             {pod.title}
                                         </h3>
-                                        <p style={{ fontSize: '13.5px', color: '#A2B6A6', lineHeight: 1.6, margin: '0 0 16px', flex: 1 }}>
+                                        <p style={{ fontSize: '13.5px', color: '#4A554D', lineHeight: 1.6, margin: '0 0 16px', flex: 1 }}>
                                             {pod.desc}
                                         </p>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                                             {(Array.isArray(pod.features) ? pod.features : (typeof pod.features === 'string' ? pod.features.split(',').map(s => s.trim()).filter(Boolean) : [])).map((feat, fidx) => (
-                                                <span key={fidx} style={{ fontSize: '12px', color: '#D5ED55', fontWeight: '600' }}>
+                                                <span key={fidx} style={{ fontSize: '12px', color: '#166534', fontWeight: '700' }}>
                                                     ✓ {feat}
                                                 </span>
                                             ))}

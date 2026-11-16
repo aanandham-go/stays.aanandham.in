@@ -216,11 +216,11 @@ export default function Step1CampsiteLodging({
                                     <span style={{
                                         fontSize: '9.5px',
                                         fontWeight: '900',
-                                        background: 'linear-gradient(135deg, #0B1A0E, #121E15)',
-                                        color: '#D5ED55',
+                                        background: 'rgba(27, 77, 62, 0.08)',
+                                        color: '#1B4D3E',
                                         padding: '2px 8px',
                                         borderRadius: '999px',
-                                        border: '1px solid rgba(213,237,85,0.3)',
+                                        border: '1px solid rgba(27, 77, 62, 0.22)',
                                         display: 'inline-flex',
                                         alignItems: 'center',
                                         gap: '3.5px'
@@ -229,41 +229,40 @@ export default function Step1CampsiteLodging({
                                             width: '10px',
                                             height: '10px',
                                             borderRadius: '50%',
-                                            background: '#D5ED55',
+                                            background: '#1B4D3E',
                                             display: 'inline-flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             flexShrink: 0
                                         }}>
-                                            <Check size={7} color="#121613" strokeWidth={3.5} />
+                                            <Check size={7} color="#FFFFFF" strokeWidth={3.5} />
                                         </span>
                                         by Aanandham.Stays
                                     </span>
                                 ) : (
                                     <span style={{
                                         fontSize: '9.5px',
-                                        fontWeight: '900',
-                                        background: '#121613',
-                                        color: '#D5ED55',
+                                        fontWeight: '800',
+                                        background: 'rgba(18, 22, 19, 0.06)',
+                                        color: '#121613',
                                         padding: '2px 8px',
                                         borderRadius: '999px',
-                                        border: '1px solid rgba(213,237,85,0.25)',
+                                        border: '1px solid rgba(18, 22, 19, 0.12)',
                                         display: 'inline-flex',
                                         alignItems: 'center',
-                                        gap: '3.5px',
-                                        boxShadow: '0 2px 5px rgba(0,0,0,0.18)'
+                                        gap: '3.5px'
                                     }}>
                                         <span style={{
                                             width: '10px',
                                             height: '10px',
                                             borderRadius: '50%',
-                                            background: '#D5ED55',
+                                            background: '#166534',
                                             display: 'inline-flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             flexShrink: 0
                                         }}>
-                                            <Check size={7} color="#121613" strokeWidth={3.5} />
+                                            <Check size={7} color="#FFFFFF" strokeWidth={3.5} />
                                         </span>
                                         Verified
                                     </span>
