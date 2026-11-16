@@ -869,7 +869,7 @@ export default function HomePage() {
                     minHeight: '100vh',
                     minHeight: '100dvh',
                     padding: 'clamp(90px, 12dvh, 130px) 24px clamp(40px, 6dvh, 70px)',
-                    backgroundImage: 'url("/images/home-hero-landing.png")',
+                    backgroundImage: 'url("/images/home-hero-landing.jpg")',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center 38%',
                     backgroundRepeat: 'no-repeat',
