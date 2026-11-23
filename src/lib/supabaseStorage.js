@@ -18,8 +18,8 @@ export const supabaseClient = IS_SUPABASE_CONFIGURED
     ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;
 
-// Supabase Storage bucket name — create this in your Supabase dashboard
-export const STORAGE_BUCKET = 'aanandham-media';
+// Supabase Storage bucket name — default to website-media for public web assets
+export const STORAGE_BUCKET = process.env.SUPABASE_PUBLIC_MEDIA_BUCKET || process.env.SUPABASE_STORAGE_BUCKET || 'website-media';
 
 /**
  * Get public CDN URL for a file in Supabase Storage
@@ -27,11 +27,19 @@ export const STORAGE_BUCKET = 'aanandham-media';
  * @returns {string} Public CDN URL
  */
 export function getPublicUrl(filePath) {
-    if (!IS_SUPABASE_CONFIGURED || !supabaseClient) return '';
-    const { data } = supabaseClient.storage
-        .from(STORAGE_BUCKET)
-        .getPublicUrl(filePath);
-    return data?.publicUrl || '';
+    if (!filePath) return '';
+    if (filePath.startsWith('http://') || filePath.startsWith('https://')) return filePath;
+    const cleanPath = filePath.replace(/^\//, '');
+    if (SUPABASE_URL) {
+        return `${SUPABASE_URL.replace(/\/$/, '')}/storage/v1/object/public/${STORAGE_BUCKET}/${cleanPath}`;
+    }
+    if (supabaseClient) {
+        const { data } = supabaseClient.storage
+            .from(STORAGE_BUCKET)
+            .getPublicUrl(cleanPath);
+        return data?.publicUrl || '';
+    }
+    return '';
 }
 
 /**

@@ -616,8 +616,10 @@ export const INITIAL_ALL_CAMPS = [
     "originalPrice": 349,
     "rating": 4.98,
     "reviewsCount": 164,
-    "image": "/images/the-nest-kalga-apple-orchard.jpg",
+    "image": "https://lonhntwguqgqiunzxcok.supabase.co/storage/v1/object/public/website-media/camps/gallery/509d78c2-28a0-41bd-b429-c94c154df6cc.webp",
     "gallery": [
+      "https://lonhntwguqgqiunzxcok.supabase.co/storage/v1/object/public/website-media/camps/gallery/509d78c2-28a0-41bd-b429-c94c154df6cc.webp",
+      "https://lonhntwguqgqiunzxcok.supabase.co/storage/v1/object/public/website-media/camps/gallery/de4cb83c-c476-4c21-aed0-a10c1ed63524.webp",
       "/images/the-nest-kalga-apple-orchard.jpg",
       "/images/treks/parvati-valley-himachal-hero.jpg",
       "/images/treks/kheerganga-trek-parvati-valley.jpg",
@@ -1436,7 +1438,11 @@ export const INITIAL_ALL_CAMPS = [
 
 export const DEPRECATED_CAMP_IDS = new Set([
   "pkg-suryanelli",
+  "pkg-tentvilla-domes",
   "pkg-mini-mexico",
+  "pkg-wildlink",
+  "pkg-meesapulimala",
+  "pkg-kolukkumalai",
   "pkg-chembra-peak",
   "pkg-900-kandi",
   "pkg-vagamon-pine",

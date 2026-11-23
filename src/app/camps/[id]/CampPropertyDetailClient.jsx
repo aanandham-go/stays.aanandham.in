@@ -506,8 +506,8 @@ export default function CampPropertyDetailClient({ campId, initialCamp, initialA
     const handleShare = async () => {
         const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
         const shareData = {
-            title: `${camp.title} | Aanandham.go Wilderness Camps`,
-            text: `Check out this verified campsite at ${camp.altitude} in ${camp.location}!`,
+            title: `${camp.title} | Aanandham Stays`,
+            text: `Check out this verified mountain stay at ${camp.altitude} in ${camp.location}!`,
             url: shareUrl
         };
 
@@ -520,11 +520,11 @@ export default function CampPropertyDetailClient({ campId, initialCamp, initialA
 
         try {
             await navigator.clipboard.writeText(shareUrl);
-            setShareToast('✓ Campsite link copied to clipboard!');
+            setShareToast('✓ Stay link copied to clipboard!');
             if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
             toastTimerRef.current = setTimeout(() => setShareToast(''), 3000);
         } catch (err) {
-            window.open(waLink(`Check out this Kerala campsite: ${camp.title} - ${shareUrl}`), '_blank');
+            window.open(waLink(`Check out this mountain stay: ${camp.title} - ${shareUrl}`), '_blank');
         }
     };
 
@@ -823,10 +823,10 @@ return (
                             {/* SECTION 1: HIGHLIGHTS & DESCRIPTION */}
                             <div className="camp-section-card">
                                 <div className="star-badge" style={{ marginBottom: '8px' }}>
-                                    <span className="star-icon">★</span> EXPEDITION OVERVIEW
+                                    <span className="star-icon">★</span> STAY OVERVIEW
                                 </div>
                                 <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '24px', fontWeight: '800', margin: '0 0 16px', color: '#121613' }}>
-                                    About This Wilderness Basecamp
+                                    About This Mountain Sanctuary
                                 </h2>
                                 <p style={{ fontSize: '15px', color: '#3A443E', lineHeight: 1.75, margin: '0 0 24px' }}>
                                     {camp.description || 'Property description unavailable (Not provided in PMS).'}
@@ -852,6 +852,43 @@ return (
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Guided Treks Feature Callout for Kalga & Himachal */}
+                                {(camp.region === 'Himachal' || camp.id === 'the-nest-kalga' || camp.slug === 'the-nest-kalga') && (
+                                    <div style={{ marginTop: '24px', background: 'rgba(27, 77, 62, 0.06)', border: '1px solid rgba(27, 77, 62, 0.2)', borderRadius: '16px', padding: '20px 22px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                                            <div style={{ flex: 1, minWidth: '260px' }}>
+                                                <span style={{ fontSize: '11px', fontWeight: '900', color: '#166534', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                                                    Alpine Trek Trailhead
+                                                </span>
+                                                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '17px', fontWeight: '800', color: '#121613', margin: '4px 0 6px' }}>
+                                                    Guided Parvati Valley Treks from Kalga Village
+                                                </div>
+                                                <p style={{ fontSize: '13px', color: '#4A554D', margin: 0, lineHeight: 1.55 }}>
+                                                    The Nest Kalga is the starting basecamp for Kheerganga Hot Springs (₹900), Bhun Buni Thatch (₹3,000) &amp; Bhandak Thach (₹3,999) with certified local mountain guides.
+                                                </p>
+                                            </div>
+                                            <Link
+                                                href="/treks"
+                                                style={{
+                                                    padding: '10px 20px',
+                                                    borderRadius: '999px',
+                                                    background: '#121613',
+                                                    color: '#FFFFFF',
+                                                    fontSize: '12.5px',
+                                                    fontWeight: '800',
+                                                    textDecoration: 'none',
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: '6px',
+                                                    whiteSpace: 'nowrap'
+                                                }}
+                                            >
+                                                <span>View Guided Treks →</span>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* SECTION 2: LODGING ROOM TYPES & TENT SELECTION */}

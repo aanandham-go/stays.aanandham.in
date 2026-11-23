@@ -27,7 +27,7 @@ import { treksData } from '@/content/treks';
 // ── OVERVIEW HIGHLIGHTS DATA (Himachal-First with Kalga & Parvati Valley) ──
 const OVERVIEW_HIGHLIGHTS = [
     {
-        img: '/images/high-altitude-ridge-tent.jpg',
+        img: 'https://lonhntwguqgqiunzxcok.supabase.co/storage/v1/object/public/website-media/camps/gallery/509d78c2-28a0-41bd-b429-c94c154df6cc.webp',
         title: 'Kalga Pine Homestays & Dorms',
         sub: 'Backpacker dorms from ₹249 & balcony rooms in Parvati Valley',
         objectPosition: 'center 60%'
@@ -506,7 +506,7 @@ const FEATURED_AANANDHAM_STAYS = [
         priceUnit: '/ bed / night',
         desc: 'Solar-powered mountain basecamp with panoramic sunrise deck, 10-bed dorm, private balcony rooms, warm firesides & apple orchard views.',
         tags: ['Sunrise Balcony', 'Campfire & BBQ', 'Orchard Views', 'Solar Powered'],
-        img: '/images/high-altitude-ridge-tent.jpg',
+        img: 'https://lonhntwguqgqiunzxcok.supabase.co/storage/v1/object/public/website-media/camps/gallery/509d78c2-28a0-41bd-b429-c94c154df6cc.webp',
         href: '/camps/the-nest-kalga',
         waMessage: 'Hi Aanandham Stays! I want to check availability for The Nest Kalga in Parvati Valley, Himachal.'
     },
@@ -2843,7 +2843,7 @@ export default function HomePage() {
 
                                 <div style={{ marginTop: 'auto', paddingTop: '12px', borderTop: '1px dashed rgba(0, 0, 0, 0.12)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <span style={{ fontSize: '11px', color: '#8E9B92', fontWeight: '700', letterSpacing: '0.5px' }}>
-                                        VERIFIED CAMPER LOGBOOK
+                                        VERIFIED TRAVELER LOGBOOK
                                     </span>
                                     <span style={{ color: '#E5A93B', fontSize: '13px' }}>
                                         ★★★★★

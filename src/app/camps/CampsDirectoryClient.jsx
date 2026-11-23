@@ -85,8 +85,9 @@ export default function CampsDirectoryClient({
                 if (res && res.ok) {
                     const serverCamps = await res.json();
                     if (Array.isArray(serverCamps) && serverCamps.length > 0) {
-                        saveAllCamps(serverCamps);
-                        setCamps(serverCamps);
+                        const valid = serverCamps.filter(c => c && c.id && !DEPRECATED_CAMP_IDS.has(c.id) && !c.archived);
+                        saveAllCamps(valid);
+                        setCamps(valid);
                         return;
                     }
                 }
@@ -268,7 +269,7 @@ export default function CampsDirectoryClient({
                             <nav aria-label="Breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#59655D', marginBottom: '14px', flexWrap: 'wrap', fontWeight: '600' }}>
                                 <Link href="/" style={{ color: '#59655D', textDecoration: 'none', transition: 'color 0.2s' }}>Home</Link>
                                 <span style={{ color: 'rgba(18, 22, 19, 0.25)' }}>/</span>
-                                <span style={{ color: '#166534', fontWeight: '800' }}>{comingSoonRegion ? `${comingSoonRegion} (Coming Soon)` : (selectedRegion !== 'All' ? `${selectedRegion} Camps` : 'Wilderness Campsites')}</span>
+                                <span style={{ color: '#166534', fontWeight: '800' }}>{comingSoonRegion ? `${comingSoonRegion} (Coming Soon)` : (selectedRegion !== 'All' ? `${selectedRegion} Stays` : 'Mountain Stays')}</span>
                             </nav>
 
                             <div style={{
@@ -305,7 +306,7 @@ export default function CampsDirectoryClient({
                                 color: '#121613'
                             }}>
                                 {heroTitle ? heroTitle : (
-                                    <>All India High-Altitude Camps & <span style={{ color: '#1B4D3E' }}>Wilderness Basecamps</span></>
+                                    <>Verified Mountain Stays for <span style={{ color: '#1B4D3E' }}>Trekkers & Tourists</span></>
                                 )}
                             </h1>
 
@@ -315,7 +316,7 @@ export default function CampsDirectoryClient({
                                 lineHeight: 1.7,
                                 margin: '0 0 28px'
                             }}>
-                                {heroSubtitle ? heroSubtitle : 'Explore verified campgrounds perched above rolling cloud beds across India — featuring luxury ridge glamping tents, 4x4 summit convoys, private campfire barbecues, and live availability across Munnar, Suryanelli, Vagamon, Wayanad, and Himalayan retreats in Himachal.'}
+                                {heroSubtitle ? heroSubtitle : 'Explore handpicked mountain stays in Himachal & Munnar — backpacker dorms from ₹249 in Parvati Valley, private alpine suites, and sunrise sky deck domes in Kolukkumalai for trekkers, backpackers, tourists, and nature travelers.'}
                             </p>
 
                             {/* Wishlist Bar Pill (Only shown if wishlist has items) */}
@@ -453,14 +454,10 @@ export default function CampsDirectoryClient({
                             <div className="camps-pills-row" data-lenis-prevent="true" data-lenis-prevent-wheel="true" data-lenis-prevent-touch="true">
                                 {[
                                     { id: 'All', label: 'All Stays' },
-                                    { id: 'resorts', label: 'Resorts' },
-                                    { id: 'villas', label: 'Villas' },
-                                    { id: 'camps', label: 'Glamp & Camps' },
-                                    { id: 'cottages-and-cabins', label: 'Cottages' },
                                     { id: 'mountain-stays', label: 'Mountain Stays' },
-                                    { id: 'homestays', label: 'Homestays' },
-                                    { id: 'houseboats', label: 'Houseboats' },
-                                    { id: 'hotels', label: 'Hotels' }
+                                    { id: 'camps', label: 'Sky Deck & Domes' },
+                                    { id: 'cottages-and-cabins', label: 'Cottages & Dorms' },
+                                    { id: 'homestays', label: 'Alpine Homestays' }
                                 ].map(cat => {
                                     const isSelected = selectedCategory === cat.id;
                                     return (
@@ -589,10 +586,15 @@ export default function CampsDirectoryClient({
                                     onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(18, 22, 19, 0.08)'; }}
                                     onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
                                 >
-                                    <div style={{ height: '200px', position: 'relative', overflow: 'hidden', background: '#121613', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                        <Mountain size={38} color="#1B4D3E" strokeWidth={1.5} style={{ opacity: 0.85 }} />
-                                        <span style={{ fontSize: '11px', fontWeight: '800', color: '#FFFFFF', letterSpacing: '0.5px', textTransform: 'uppercase' }}>8,000 FT Alpine Sanctuary</span>
-                                        <span style={{ fontSize: '10px', color: '#A3B1A7', fontWeight: '600' }}>Live Photos Being Verified</span>
+                                    <div style={{ height: '200px', position: 'relative', overflow: 'hidden' }}>
+                                        <AssetImage
+                                            src={camps.find(c => c.id === 'the-nest-kalga' || c.id === 'cmu7f7c7q0001jf2bn12igi66' || c.slug === 'the-nest-kalga')?.image || "https://lonhntwguqgqiunzxcok.supabase.co/storage/v1/object/public/website-media/camps/gallery/509d78c2-28a0-41bd-b429-c94c154df6cc.webp"}
+                                            fallbackSrc="/images/the-nest-kalga-apple-orchard.jpg"
+                                            alt="The Nest Kalga pine cottages and mountain sanctuary in Parvati Valley"
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, 400px"
+                                        />
+                                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 40%, rgba(0,0,0,0.65) 100%)' }} />
                                         {/* Top badges */}
                                         <div style={{ position: 'absolute', top: '12px', left: '12px', display: 'flex', gap: '6px' }}>
                                             <span style={{ background: '#1B4D3E', color: '#FFFFFF', fontSize: '10px', fontWeight: '900', padding: '3px 8px', borderRadius: '999px' }}>Cottages &amp; Cabins</span>
@@ -722,7 +724,7 @@ export default function CampsDirectoryClient({
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', borderTop: '1px solid rgba(18, 22, 19, 0.08)', paddingTop: '14px' }}>
                                             <div>
                                                 <div style={{ fontSize: '9.5px', fontWeight: '800', color: '#7D8880', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Starts at</div>
-                                                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '22px', fontWeight: '900', color: '#121613', lineHeight: 1 }}>₹2,299 <span style={{ fontSize: '11px', fontWeight: '600', color: '#59655D' }}>/ camper</span></div>
+                                                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '22px', fontWeight: '900', color: '#121613', lineHeight: 1 }}>₹2,299 <span style={{ fontSize: '11px', fontWeight: '600', color: '#59655D' }}>/ guest</span></div>
                                             </div>
                                             <div style={{ display: 'flex', gap: '8px' }}>
                                                 <button onClick={e => { e.stopPropagation(); router.push('/camps/pkg-kolukkumalai-teddy-domes'); }} style={{ padding: '9px 16px', borderRadius: '10px', background: '#FFFFFF', border: '1px solid rgba(18, 22, 19, 0.12)', color: '#121613', fontSize: '12px', fontWeight: '800', cursor: 'pointer' }}>Details →</button>
@@ -736,14 +738,14 @@ export default function CampsDirectoryClient({
                     </div>
                 </section>
 
-                {/* ── CAMPSITES LISTING GRID ── */}
+                {/* ── MOUNTAIN STAYS LISTING GRID ── */}
                 <section id="aanandham-stays-section" style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 clamp(20px, 4vw, 48px)', scrollMarginTop: '90px' }}>
                     
                     {/* Header showing count */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
                         <div>
                             <span style={{ fontSize: '13px', fontWeight: '800', color: '#7D8880', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
-                                Showing {filteredCamps.length} of {camps.length} Campsites
+                                Showing {filteredCamps.length} of {camps.length} Mountain Stays
                             </span>
                         </div>
                         {onlyWishlisted && (
@@ -751,23 +753,23 @@ export default function CampsDirectoryClient({
                                 onClick={() => setOnlyWishlisted(false)}
                                 style={{ background: 'none', border: 'none', color: '#166534', fontWeight: '800', fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}
                             >
-                                Show All Basecamps →
+                                Show All Stays →
                             </button>
                         )}
                     </div>
 
                     {isLoading && camps.length === 0 ? (
-                        <div style={{ padding: '12px 0 40px' }}>
-                            <SkeletonCampGrid count={6} />
-                        </div>
+                         <div style={{ padding: '12px 0 40px' }}>
+                             <SkeletonCampGrid count={2} />
+                         </div>
                     ) : filteredCamps.length === 0 ? (
                         <div style={{ background: '#FFFFFF', borderRadius: '24px', padding: '60px 20px', textAlign: 'center', border: '1px solid rgba(18,22,19,0.08)' }}>
-                            <div style={{ fontSize: '42px', marginBottom: '14px', display: 'inline-flex' }}><Tent size={42} strokeWidth={1.6} /></div>
+                            <div style={{ fontSize: '42px', marginBottom: '14px', display: 'inline-flex' }}><Mountain size={42} strokeWidth={1.6} /></div>
                             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '22px', fontWeight: '800', margin: '0 0 8px' }}>
-                                No campsites match your filters
+                                No mountain stays match your filters
                             </h3>
                             <p style={{ fontSize: '14px', color: '#59655D', marginBottom: '20px' }}>
-                                Try clearing search filters or switching to "All India" regions.
+                                Try clearing search filters or switching between Himachal and Munnar.
                             </p>
                             <button
                                 onClick={() => {
