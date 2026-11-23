@@ -6,16 +6,16 @@ import { INITIAL_ALL_CAMPS } from '@/lib/campsData';
 import { waLink } from '@/lib/whatsapp';
 
 export const metadata = {
-  title: 'North Himachal Stays: Kalga & Kasol | Aanandham Stays',
+  title: 'Stays in Kalga Himachal & Kasol: The Nest | Aanandham Stays',
   description:
-    'Book verified North Himachal stays from ₹249 in Kalga & Kasol. Backpacker dorms, private balcony rooms, sunrise views, campfires & Kheerganga trek access.',
+    'Book verified stays in Kalga Himachal from ₹249. Backpacker dorms & balcony suites at The Nest Kalga with apple orchard views, Siddu dining & Kheerganga access.',
   alternates: {
     canonical: 'https://stays.aanandham.in/camps/himachal',
   },
   openGraph: {
-    title: 'North Himachal Stays: Kalga & Kasol | Aanandham Stays',
+    title: 'Stays in Kalga Himachal & Kasol: The Nest | Aanandham Stays',
     description:
-      'Book verified North Himachal stays from ₹249 in Kalga & Kasol. Backpacker dorms, private balcony rooms, sunrise views, campfires & Kheerganga trek access.',
+      'Book verified stays in Kalga Himachal from ₹249. Backpacker dorms & balcony suites at The Nest Kalga with apple orchard views, Siddu dining & Kheerganga access.',
     url: 'https://stays.aanandham.in/camps/himachal',
     siteName: 'Aanandham Stays',
     images: [
@@ -31,7 +31,7 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'North Himachal Stays: Kalga & Kasol | Aanandham Stays',
+    title: 'Stays in Kalga Himachal & Kasol: The Nest | Aanandham Stays',
     description:
       'Affordable dorms from ₹249, balcony rooms & scenic homestays in Kalga & Kasol with Aanandham Stays.',
     images: ['https://stays.aanandham.in/images/treks/parvati-valley-himachal-hero.jpg'],

@@ -1,19 +1,23 @@
-// Curated core intent terms — trimmed to avoid legacy keyword stuffing
+// Curated core intent terms — focused on top-ranking Himachal (Kalga/Kasol) and Munnar stays
 export const SEO_KEYWORDS = [
-  'Aanandham.go',
-  'Munnar camping',
-  'Kolukkumalai sunrise trek',
-  'Suryanelli tent stays',
-  'Kerala glamping',
-  'Western Ghats wilderness camps',
-  'Meesapulimala trekking',
-  'High-altitude camping Kerala'
+  'Aanandham Stays',
+  'Stays in Kalga',
+  'Stays in Kalga Himachal',
+  'The Nest Kalga',
+  'Homestays in Kalga',
+  'Places to stay in Kalga',
+  'Stays in Kasol',
+  'Budget dorms in Kalga from ₹249',
+  'Parvati Valley backpacker stays',
+  'Himachal mountain homestays',
+  'Kolukkumalai Teddy Stays',
+  'Munnar cloudbed glamping'
 ];
 
 // Aggregate rating shown in local SEO schema (backed by verified camper reviews).
 export const SITE_RATING = {
   '@type': 'AggregateRating',
-  ratingValue: '4.9',
+  ratingValue: '4.98',
   bestRating: '5',
-  reviewCount: '1200',
+  reviewCount: '164',
 };

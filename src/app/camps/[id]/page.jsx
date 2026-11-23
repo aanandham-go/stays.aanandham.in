@@ -218,7 +218,7 @@ async function resolveCamp(id) {
 
 export async function generateStaticParams() {
     const params = new Set();
-    INITIAL_ALL_CAMPS.forEach(camp => {
+    getAllCamps().forEach(camp => {
         if (camp.id) params.add(camp.id);
         if (camp.slug) params.add(camp.slug);
         if (Array.isArray(camp.aliases)) {
