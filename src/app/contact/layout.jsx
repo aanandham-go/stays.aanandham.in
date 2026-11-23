@@ -1,20 +1,20 @@
 export const metadata = {
-  title: 'Contact & Reservations',
-  description: 'Connect with Aanandham.go coordinators. 24/7 WhatsApp concierge, instant booking reservations, and GPS directions to Suryanelli Ridge, Munnar.',
+  title: 'Contact & Reservations | Aanandham Stays',
+  description: 'Connect with Aanandham Stays coordinators. 24/7 WhatsApp concierge, instant booking reservations, and GPS directions to Kalga and Munnar.',
   alternates: {
-    canonical: 'https://www.aanandham.in/contact',
+    canonical: 'https://stays.aanandham.in/contact',
   },
   openGraph: {
-    title: 'Contact & Reservations',
-    description: 'Instant WhatsApp booking support, trail coordinates, and direct camp reservations for Munnar & Western Ghats glamping.',
-    url: 'https://www.aanandham.in/contact',
-    siteName: 'Aanandham.go',
+    title: 'Contact & Reservations | Aanandham Stays',
+    description: 'Instant WhatsApp booking support, trail coordinates, and direct stay reservations for Kalga and Munnar.',
+    url: 'https://stays.aanandham.in/contact',
+    siteName: 'Aanandham Stays',
     images: [
       {
         url: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1200&h=630&q=80',
         width: 1200,
         height: 630,
-        alt: 'Contact Aanandham.go Wilderness Basecamp Concierge',
+        alt: 'Contact Aanandham Stays Mountain Concierge',
       },
     ],
     locale: 'en_IN',
@@ -22,14 +22,14 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Contact & Reservations',
+    title: 'Contact & Reservations | Aanandham Stays',
     description: 'Instant WhatsApp booking support, trail coordinates, and campsite reservations.',
     creator: '@aanandham_go',
     images: ['https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1200&h=630&q=80'],
   }
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.aanandham.in';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://stays.aanandham.in';
 
 const contactJsonLd = {
   '@context': 'https://schema.org',

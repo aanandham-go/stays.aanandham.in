@@ -54,7 +54,7 @@ const MARQUEE_ITEMS = [
 export default function BlogIndexPage() {
   const sorted = [...BLOG_POSTS].sort((a, b) => (a.date < b.date ? 1 : -1));
   const featured = sorted[0];
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.aanandham.in';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://stays.aanandham.in';
 
   const blogBreadcrumbJsonLd = {
     '@context': 'https://schema.org',

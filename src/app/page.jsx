@@ -693,7 +693,7 @@ export default function HomePage() {
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: `${pkg.title} | Aanandham.go`,
+                    title: `${pkg.title} | Aanandham Stays`,
                     text: `Check out ${pkg.title} at ${pkg.altitude} in ${pkg.location}!`,
                     url: shareUrl
                 });
@@ -908,7 +908,7 @@ export default function HomePage() {
                     >
                         <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#D5ED55' }} />
                         <span style={{ fontSize: '11.5px', fontWeight: '800', color: '#D5ED55', letterSpacing: '1.2px', textTransform: 'uppercase' }}>
-                            ✦ BY AANANDHAM.GO
+                            ✦ BY AANANDHAM STAYS
                         </span>
                     </motion.div>
 
@@ -2086,7 +2086,7 @@ export default function HomePage() {
                                     “We were engineering students asking ourselves: Is life really meant to be just about classes, deadlines, and waiting for the next break?”
                                 </p>
                                 <p style={{ fontSize: '13px', color: '#59655D', lineHeight: 1.65, marginBottom: '16px', borderLeft: '2px solid #E5A93B', paddingLeft: '12px' }}>
-                                    We took to the road to wake up surrounded by mountains, meet strangers, and feel truly alive. We discovered that happiness became easier to find when we were together — laughing by campfires and sharing stories we’d never planned. That is why we built <strong>Aanandham.go</strong>: a community where strangers become friends and happiness comes naturally.
+                                    We took to the road to wake up surrounded by mountains, meet strangers, and feel truly alive. We discovered that happiness became easier to find when we were together — laughing by campfires and sharing stories we’d never planned. That is why we built <strong>Aanandham Stays</strong>: a community where strangers become friends and happiness comes naturally.
                                 </p>
                                 <div style={{ fontSize: '12.5px', fontWeight: '800', color: '#166534', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     <span>“Go somewhere. Meet someone. Feel something. Go with Aanandham.”</span>
@@ -2232,7 +2232,7 @@ export default function HomePage() {
                             className="why-content-col reveal-fade-right"
                         >
                             <div className="star-badge">
-                                <span className="star-icon">★</span> WHY AANANDHAM.GO
+                                <span className="star-icon">★</span> WHY AANANDHAM STAYS
                             </div>
                             <h2 style={{
                                 fontFamily: 'var(--font-heading)',

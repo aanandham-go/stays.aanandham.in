@@ -43,9 +43,9 @@ function escapeHtml(str) {
  */
 
 function resolveSiteUrl() {
-    const raw = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://www.aanandham.in';
+    const raw = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://stays.aanandham.in';
     if (!raw || raw.includes('localhost') || raw.includes('127.0.0.1')) {
-        return 'https://www.aanandham.in';
+        return 'https://stays.aanandham.in';
     }
     return raw.replace(/\/+$/, '');
 }
@@ -101,7 +101,7 @@ export async function sendBookingConfirmationEmail(booking) {
     });
 
     // Production public URL for logo — works in all email clients (no attachment trick needed)
-    const logoPublicUrl = 'https://www.aanandham.in/logo.png';
+    const logoPublicUrl = 'https://stays.aanandham.in/logo.png';
 
     const safeId = escapeHtml(booking.id);
     const safeName = escapeHtml(booking.name);
@@ -303,8 +303,8 @@ export async function sendBookingConfirmationEmail(booking) {
             </div>
 
             <div class="footer" style="background-color: #F8FAF7 !important; padding: 22px; text-align: center; font-size: 12px; color: #64748B !important; border-top: 1px solid #E2E8F0;">
-                <p style="margin: 0 0 4px;">Aanandham.go · Suryanelli, Munnar, Kerala</p>
-                <p style="margin: 0;">Camp Hotline: +91 90748 58014 · <a href="${siteUrl}" style="color: #166534; text-decoration: none; font-weight: 700;">aanandham.in</a></p>
+                <p style="margin: 0 0 4px;">Aanandham Stays · Kalga & Munnar Mountain Sanctuaries</p>
+                <p style="margin: 0;">Camp Hotline: +91 90748 58014 · <a href="${siteUrl}" style="color: #166534; text-decoration: none; font-weight: 700;">stays.aanandham.in</a></p>
             </div>
         </div>
     </body>
@@ -453,8 +453,8 @@ export async function sendContactInquiryEmail(inquiry) {
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0B150E; color: #FFFFFF; padding: 24px; margin: 0;">
             <div style="max-width: 600px; margin: 0 auto; background: #121F16; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 32px;">
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <img src="https://www.aanandham.in/logo.png" alt="Aanandham Wilderness" width="56" height="56" style="display:block;margin:0 auto 10px;border-radius:12px;object-fit:contain;" />
-                    <div style="font-size: 11px; font-weight: 800; color: #D5ED55; letter-spacing: 2px; text-transform: uppercase;">AANANDHAM WILDERNESS BASECAMPS</div>
+                    <img src="https://stays.aanandham.in/logo.png" alt="Aanandham Stays" width="56" height="56" style="display:block;margin:0 auto 10px;border-radius:12px;object-fit:contain;" />
+                    <div style="font-size: 11px; font-weight: 800; color: #D5ED55; letter-spacing: 2px; text-transform: uppercase;">AANANDHAM STAYS</div>
                     <h1 style="font-size: 24px; font-weight: 800; color: #FFFFFF; margin: 8px 0 0;">We Received Your Inquiry! 🏔️</h1>
                 </div>
 
@@ -474,7 +474,7 @@ export async function sendContactInquiryEmail(inquiry) {
 
                 <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; margin-top: 24px; text-align: center;">
                     <p style="font-size: 12.5px; color: #8E9B92; margin: 0 0 6px;">Need urgent ridge assistance or same-day check-in?</p>
-                    <p style="font-size: 13px; color: #FFFFFF; font-weight: 700; margin: 0;">24/7 Mountain Dispatch: ${formattedPhone} · <a href="${siteUrl}" style="color: #D5ED55; text-decoration: none;">aanandham.in</a></p>
+                    <p style="font-size: 13px; color: #FFFFFF; font-weight: 700; margin: 0;">24/7 Mountain Dispatch: ${formattedPhone} · <a href="${siteUrl}" style="color: #D5ED55; text-decoration: none;">stays.aanandham.in</a></p>
                 </div>
             </div>
         </body>

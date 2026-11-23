@@ -10,7 +10,7 @@ export const metadata = {
     },
   },
   alternates: {
-    canonical: 'https://www.aanandham.in/cms',
+    canonical: 'https://stays.aanandham.in/cms',
   },
 };
 

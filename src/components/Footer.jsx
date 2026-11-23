@@ -211,8 +211,8 @@ export default function Footer() {
                 </div>
 
                 {/* Smooth Watermark Light-Up with Single Interactive Letters */}
-                <div className="watermark-brand" aria-label="aanandham.go">
-                    {"aanandham.go".split('').map((char, i) => (
+                <div className="watermark-brand" aria-label="stays.aanandham">
+                    {"stays.aanandham".split('').map((char, i) => (
                         <span 
                             key={i} 
                             className={`watermark-char ${char === '.' ? 'dot-char' : ''}`}

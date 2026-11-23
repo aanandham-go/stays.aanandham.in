@@ -516,7 +516,7 @@ function BookingEngineModalInner({
                 currency: rzpOrder.currency || 'INR',
                 name: paymentSettings.payeeName || 'Aanandham Wilderness Stays',
                 description: `${selectedPkg.title} - ${selectedRoom?.name || 'Camp Booking'}`,
-                image: typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://www.aanandham.in/logo.png' : undefined,
+                image: typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://stays.aanandham.in/logo.png' : undefined,
                 order_id: rzpOrder.id,
                 prefill: {
                     name: customerName?.trim() || 'Wilderness Explorer',

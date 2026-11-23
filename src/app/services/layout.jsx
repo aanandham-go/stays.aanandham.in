@@ -3,13 +3,13 @@ export const metadata = {
   title: 'Services & Studio — Aanandham × OpenZen',
   description: 'High-altitude mountain sanctuaries, 4x4 sunrise safaris, and production software engineering. OpenZen tech division and Aanandham creative studio under one roof.',
   alternates: {
-    canonical: 'https://www.aanandham.in/services'
+    canonical: 'https://stays.aanandham.in/services'
   },
   openGraph: {
     title: 'Services & Studio — Aanandham × OpenZen',
     description: 'High-altitude mountain sanctuaries, 4x4 sunrise safaris, and production software engineering. Explore our full ecosystem.',
-    url: 'https://www.aanandham.in/services',
-    siteName: 'Aanandham.go',
+    url: 'https://stays.aanandham.in/services',
+    siteName: 'Aanandham Stays',
     images: [
       {
         url: 'https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?auto=format&fit=crop&w=1200&q=80',
