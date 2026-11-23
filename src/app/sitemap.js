@@ -2,7 +2,8 @@ import { INITIAL_ALL_CAMPS, DEPRECATED_CAMP_IDS } from '@/lib/campsData';
 import { getAllBlogSlugs } from '@/lib/blogPosts';
 
 export default function sitemap() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://stays.aanandham.in';
+  const rawUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://stays.aanandham.in';
+  const siteUrl = rawUrl.includes('stays.aanandham.in') ? rawUrl.replace(/\/$/, '') : 'https://stays.aanandham.in';
   const currentDate = new Date().toISOString();
 
   // Primary Money Pages & Core Landing Routes
