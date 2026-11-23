@@ -246,14 +246,14 @@ export async function generateMetadata({ params }) {
     // Strict 50-60 character titles with primary topic first, brand last
     let cleanTitle = `${camp.shortTitle || camp.title} | Aanandham Stays`;
     if (camp.id === 'the-nest-kalga' || camp.slug === 'the-nest-kalga') {
-        cleanTitle = 'The Nest Kalga: Dorms & Stays in Kasol | Aanandham Stays';
+        cleanTitle = 'Stays in Kalga: The Nest Dorms & Suites | Aanandham Stays';
     } else if (cleanTitle.length > 60) {
         cleanTitle = `${(camp.shortTitle || camp.title).slice(0, 42)} | Aanandham Stays`;
     }
 
     // Strict 140-160 character description
     let cleanDesc = camp.id === 'the-nest-kalga' || camp.slug === 'the-nest-kalga'
-        ? 'Stay at The Nest Kalga at 7,900 FT in Parvati Valley. Affordable 10-bed dorms from ₹249, private balcony suites, sunrise deck, and homecooked Pahadi food.'
+        ? 'Book verified stays in Kalga at The Nest (7,900 FT). 10-bed alpine dorms from ₹249, sunrise balcony suites, hot water, campfire & direct host rates with zero fee.'
         : (camp.description && camp.description.length >= 140 && camp.description.length <= 160
             ? camp.description
             : `Book ${camp.shortTitle || camp.title} at ${camp.altitude || 'high altitude'} in ${camp.location || camp.region}. Verified boutique sanctuary with direct host rates.`);

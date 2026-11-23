@@ -108,11 +108,9 @@ export const metadata = {
     'ICBM': '10.0261, 77.1420',
   },
   manifest: '/site.webmanifest?v=2',
-  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? {
-    verification: {
-      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
-    },
-  } : {}),
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'JGDIH7jk1TNyNCKm6PRveZc5VIoWPCuj4ShHzpEwn1U',
+  },
 };
 
 const jsonLd = {
