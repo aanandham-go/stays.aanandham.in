@@ -45,12 +45,6 @@ export default function sitemap() {
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/services`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
       url: `${siteUrl}/contact`,
       lastModified: currentDate,
       changeFrequency: 'monthly',

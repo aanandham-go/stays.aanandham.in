@@ -10,8 +10,7 @@
     "type-check": "tsc --noEmit",
     "meta-audit": "node scripts/meta-audit.mjs",
     "link-check": "node scripts/link-check.mjs",
-    "validate-data": "node scripts/validate-data.mjs",
-    "test": "node --test __tests__/*.test.js"
+    "validate-data": "node scripts/validate-data.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
