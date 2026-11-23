@@ -27,6 +27,13 @@ async function resolveCamp(id) {
         if (liveDetails) {
             const liveRooms = await fetchLivePropertyRooms(id);
             const basePrice = Number(liveDetails.basePrice || 0);
+            const fallbackCamp = getCampById(id);
+            const liveImage = (liveDetails.image && liveDetails.image.trim() && !liveDetails.image.startsWith('data:image'))
+                ? liveDetails.image.trim()
+                : (fallbackCamp?.image || '');
+            const rawGallery = ensureArray(liveDetails.gallery, []).filter(img => typeof img === 'string' && !img.startsWith('data:image'));
+            const liveGallery = rawGallery.length > 0 ? rawGallery : (fallbackCamp?.gallery || [liveImage].filter(Boolean));
+
             return {
                 id: liveDetails.id,
                 slug: liveDetails.slug || id,
@@ -53,27 +60,32 @@ async function resolveCamp(id) {
                 latitude: (liveDetails.latitude !== null && !isNaN(Number(liveDetails.latitude))) ? Number(liveDetails.latitude) : null,
                 longitude: (liveDetails.longitude !== null && !isNaN(Number(liveDetails.longitude))) ? Number(liveDetails.longitude) : null,
                 phone: (liveDetails.phone && liveDetails.phone !== 'null') ? liveDetails.phone : null,
-                image: (liveDetails.image && liveDetails.image.trim()) ? liveDetails.image.trim() : '',
-                gallery: ensureArray(liveDetails.gallery, []),
+                image: liveImage,
+                gallery: liveGallery,
                 isAvailable: liveDetails.isActive !== false,
-                rooms: (Array.isArray(liveRooms) ? liveRooms : []).map(rt => ({
-                    id: rt.id,
-                    name: rt.name,
-                    price: Number(rt.price ?? rt.basePrice ?? basePrice),
-                    basePrice: Number(rt.price ?? rt.basePrice ?? basePrice),
-                    weekendPrice: rt.weekendPrice ? Number(rt.weekendPrice) : null,
-                    capacity: rt.capacity || '2 Guests',
-                    guestCapacity: rt.guestCapacity || 2,
-                    totalUnits: Number(rt.totalUnits) || 1,
-                    features: Array.isArray(rt.features) ? rt.features : [],
-                    description: rt.description || '',
-                    inventoryType: rt.inventoryType || 'PRIVATE_UNIT',
-                    bedConfig: rt.bedConfig || '',
-                    roomSizeSqFt: rt.roomSizeSqFt || null,
-                    bathroomType: rt.bathroomType || '',
-                    pricingModel: rt.pricingModel || (rt.inventoryType === 'DORM_BED' ? 'PER_BED' : 'PER_ROOM'),
-                    image: (Array.isArray(rt.images) && rt.images[0]) ? rt.images[0] : (typeof rt.images === 'string' ? rt.images : '')
-                }))
+                rooms: (Array.isArray(liveRooms) ? liveRooms : []).map(rt => {
+                    const rtImageRaw = (Array.isArray(rt.images) && rt.images[0]) ? rt.images[0] : (typeof rt.images === 'string' ? rt.images : '');
+                    const isDummyImage = !rtImageRaw || rtImageRaw.startsWith('data:image');
+                    const roomImage = !isDummyImage ? rtImageRaw : liveImage;
+                    return {
+                        id: rt.id,
+                        name: rt.name,
+                        price: Number(rt.price ?? rt.basePrice ?? basePrice),
+                        basePrice: Number(rt.price ?? rt.basePrice ?? basePrice),
+                        weekendPrice: rt.weekendPrice ? Number(rt.weekendPrice) : null,
+                        capacity: rt.capacity || '2 Guests',
+                        guestCapacity: rt.guestCapacity || 2,
+                        totalUnits: Number(rt.totalUnits) || 1,
+                        features: Array.isArray(rt.features) ? rt.features : [],
+                        description: rt.description || '',
+                        inventoryType: rt.inventoryType || 'PRIVATE_UNIT',
+                        bedConfig: rt.bedConfig || '',
+                        roomSizeSqFt: rt.roomSizeSqFt || null,
+                        bathroomType: rt.bathroomType || '',
+                        pricingModel: rt.pricingModel || (rt.inventoryType === 'DORM_BED' ? 'PER_BED' : 'PER_ROOM'),
+                        image: roomImage
+                    };
+                })
             };
         }
     } catch (e) {
