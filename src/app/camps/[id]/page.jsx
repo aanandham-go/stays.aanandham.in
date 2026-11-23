@@ -64,9 +64,10 @@ async function resolveCamp(id) {
                 gallery: liveGallery,
                 isAvailable: liveDetails.isActive !== false,
                 rooms: (Array.isArray(liveRooms) ? liveRooms : []).map(rt => {
-                    const rtImageRaw = (Array.isArray(rt.images) && rt.images[0]) ? rt.images[0] : (typeof rt.images === 'string' ? rt.images : '');
-                    const isDummyImage = !rtImageRaw || rtImageRaw.startsWith('data:image');
-                    const roomImage = !isDummyImage ? rtImageRaw : liveImage;
+                    const rawImagesList = Array.isArray(rt.images)
+                        ? rt.images.filter(img => typeof img === 'string' && img.trim() && !img.startsWith('data:image'))
+                        : (typeof rt.images === 'string' && rt.images.trim() && !rt.images.startsWith('data:image') ? [rt.images.trim()] : []);
+                    const roomImage = rawImagesList[0] || '';
                     return {
                         id: rt.id,
                         name: rt.name,
@@ -83,7 +84,8 @@ async function resolveCamp(id) {
                         roomSizeSqFt: rt.roomSizeSqFt || null,
                         bathroomType: rt.bathroomType || '',
                         pricingModel: rt.pricingModel || (rt.inventoryType === 'DORM_BED' ? 'PER_BED' : 'PER_ROOM'),
-                        image: roomImage
+                        image: roomImage,
+                        images: rawImagesList
                     };
                 })
             };

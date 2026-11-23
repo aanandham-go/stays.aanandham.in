@@ -17,7 +17,7 @@ import CustomDateBatchPicker from '../../../components/CustomDateBatchPicker';
 import CustomSelectDropdown from '../../../components/CustomSelectDropdown';
 import LucideAmenityIcon from '../../../components/common/LucideAmenityIcon';
 import { SkeletonPropertyDetail, AssetImage } from '../../../components/common/SkeletonLoader';
-import { Check, X, Sparkles, MapPin, Mountain, Clock, Compass, Share2, Heart, Tent, Users, ShieldCheck, Trees, Camera, Zap, Lock, TriangleAlert, CheckCircle2, Building2, Home, Bed, Landmark, Bath, BedDouble, Maximize2, ImageOff, Navigation, ExternalLink, MapPinOff } from 'lucide-react';
+import { Check, X, Sparkles, MapPin, Mountain, Clock, Compass, Share2, Heart, Tent, Users, ShieldCheck, Trees, Camera, Zap, Lock, TriangleAlert, CheckCircle2, Building2, Home, Bed, Landmark, Bath, BedDouble, Maximize2, Navigation, ExternalLink, MapPinOff } from 'lucide-react';
 import { WhatsAppIcon } from '../../../components/common/BrandIcons';
 import { INITIAL_ALL_CAMPS, getAllCamps, getCampById, saveAllCamps } from '../../../lib/campsData';
 import { inr, getDefaultUpcomingBatch, parseStayNights } from '../../../lib/utils';
@@ -268,7 +268,9 @@ export default function CampPropertyDetailClient({ campId, initialCamp, initialA
         if (!url || typeof url !== 'string') return false;
         const trimmed = url.trim();
         if (!trimmed) return false;
+        if (trimmed.startsWith('data:image')) return false;
         if (trimmed.includes('images.unsplash.com')) return false;
+        if (trimmed.includes('high-altitude-ridge-tent.jpg')) return false;
         return true;
     };
 
@@ -1045,29 +1047,7 @@ return (
                                                         );
                                                     }
 
-                                                    return (
-                                                        <div
-                                                            className="room-card-media"
-                                                            style={{
-                                                                width: 'clamp(120px, 18vw, 150px)',
-                                                                height: '110px',
-                                                                borderRadius: '14px',
-                                                                background: '#F1F3EC',
-                                                                border: '1px dashed rgba(18, 22, 19, 0.15)',
-                                                                display: 'flex',
-                                                                flexDirection: 'column',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                                gap: '6px',
-                                                                flexShrink: 0,
-                                                                color: '#7D8880'
-                                                            }}
-                                                            title="No room photo provided"
-                                                        >
-                                                            <ImageOff size={22} color="#9CA3AF" />
-                                                            <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.2px' }}>No preview</span>
-                                                        </div>
-                                                    );
+                                                    return null;
                                                 })()}
 
                                                 <div className="room-card-main" style={{ flex: 1, minWidth: '200px' }}>

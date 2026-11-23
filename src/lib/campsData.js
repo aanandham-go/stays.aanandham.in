@@ -670,7 +670,7 @@ export const INITIAL_ALL_CAMPS = [
         "bedConfig": "1 King Bed",
         "bathroomType": "Ensuite Private Bathroom",
         "pricingModel": "PER_ROOM",
-        "image": "/images/high-altitude-ridge-tent.jpg"
+        "image": ""
       },
       {
         "id": "cmuslu0pj000bw0w8hkh2sl8e",
@@ -693,7 +693,7 @@ export const INITIAL_ALL_CAMPS = [
         "bedConfig": "2 Twin Beds",
         "bathroomType": "Ensuite Private Bathroom",
         "pricingModel": "PER_ROOM",
-        "image": "/images/high-altitude-ridge-tent.jpg"
+        "image": ""
       },
       {
         "id": "cmuslu0pj0009w0w851q5h0vq",
@@ -715,7 +715,7 @@ export const INITIAL_ALL_CAMPS = [
         "bedConfig": "1 Single Bed",
         "bathroomType": "Shared / Common Restroom",
         "pricingModel": "PER_BED",
-        "image": "/images/high-altitude-ridge-tent.jpg"
+        "image": ""
       }
     ]
   },
